@@ -1,5 +1,54 @@
-﻿<h3>Index</h3>
+﻿@page "/"
+@using Lost_And_Found_Portal.Components.Models
+@using Lost_And_Found_Portal.Services
+@inject IItemService ItemService
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold">Recent <span class="text-info">Reports</span></h2>
+        <a href="/post-item" class="btn btn-info shadow-sm px-4">Report New Item</a>
+    </div>
+
+    <div class="row g-4">
+        @if (items == null)
+        {
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-info" role="status"></div>
+                <p class="text-secondary mt-2">Fetching records...</p>
+            </div>
+        }
+        else if (!items.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-secondary">No items reported yet. Be the first!</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in items)
+            {
+                <div class="col-md-4">
+                    <div class="obsidian-card p-3 h-100 border-start border-info border-4 shadow-lg"
+                         style="background: #161b22; border-radius: 8px;">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge @(item.Status == "Lost" ? "bg-danger" : "bg-success")">@item.Status</span>
+                            <small class="text-muted">ID: #@item.Id</small>
+                        </div>
+                        <h5 class="text-white fw-bold">@item.Title</h5>
+                        <p class="text-secondary mb-0">Category: <span class="text-light">@item.Category</span></p>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
 
 @code {
+    private List<Item> items;
 
+    protected override async Task OnInitializedAsync()
+    {
+        // This calls the logic you just wrote in ItemService.cs
+        items = await ItemService.GetAllItemsAsync();
+    }
 }
