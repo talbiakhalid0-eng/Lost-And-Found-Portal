@@ -1,10 +1,14 @@
 using Lost_And_Found_Portal.Components;
+using Lost_And_Found_Portal.Components.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
