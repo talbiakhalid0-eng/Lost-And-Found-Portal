@@ -1,5 +1,52 @@
-﻿<h3>PostItem</h3>
+﻿@page "/post-item"
+@using Lost_And_Found_Portal.Components.Models
+@using Lost_And_Found_Portal.Components.Services
+@inject IItemService ItemService
+@inject NavigationManager Nav
+
+<div class="container mt-5">
+    <div class="obsidian-card p-4 shadow-lg border-info">
+        <h2 class="text-info mb-4 fw-bold">Report Lost/Found Item</h2>
+
+        <EditForm Model="@newItem" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger mb-3" />
+
+            <div class="mb-3">
+                <label class="form-label text-secondary">Item Title</label>
+                <InputText @bind-Value="newItem.Title" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Blue Wallet" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label text-secondary">Category</label>
+                    <InputSelect @bind-Value="newItem.Category" class="form-select bg-dark text-white border-secondary">
+                        <option value="">Select Category</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Documents">Documents</option>
+                        <option value="Personal">Personal Items</option>
+                    </InputSelect>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label text-secondary">Status</label>
+                    <InputSelect @bind-Value="newItem.Status" class="form-select bg-dark text-white border-secondary">
+                        <option value="Lost">Lost</option>
+                        <option value="Found">Found</option>
+                    </InputSelect>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-info w-100 py-2 fw-bold mt-3 shadow">Submit Report</button>
+        </EditForm>
+    </div>
+</div>
 
 @code {
+    private Item newItem = new();
 
+    private async Task HandleSubmit()
+    {
+        var success = await ItemService.CreateItemAsync(newItem);
+        if (success) Nav.NavigateTo("/");
+    }
 }
