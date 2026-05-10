@@ -1,5 +1,6 @@
 using Lost_And_Found_Portal.Components;
 using Lost_And_Found_Portal.Components.Data;
+using Lost_And_Found_Portal.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IItemService, ItemService>();
 
 var app = builder.Build();
 
