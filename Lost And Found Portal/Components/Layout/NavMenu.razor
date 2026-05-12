@@ -1,11 +1,24 @@
 ﻿<div class="p-4">
     <h4 class="text-white fw-bold mb-4">Certo <span class="text-info">Portal</span></h4>
     <nav class="nav flex-column">
-        <NavLink class="nav-link text-secondary py-2" href="" Match="NavLinkMatch.All">
-            <span class="bi bi-house-door-fill"></span> Dashboard
+        <NavLink class="nav-link text-light mb-2 p-2 rounded hover-effect" href="" Match="NavLinkMatch.All">
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
         </NavLink>
-        <NavLink class="nav-link text-secondary py-2" href="post-item">
-            <span class="bi bi-plus-circle-fill"></span> Report Item
+        <NavLink class="nav-link text-light mb-2 p-2 rounded hover-effect" href="post-item">
+            <i class="bi bi-plus-square me-2"></i> Report Item
         </NavLink>
     </nav>
 </div>
+
+<style>
+    .nav-link:hover {
+        background: #30363d;
+        color: #58a6ff !important;
+    }
+
+    .active {
+        background: #1f242c;
+        border-left: 4px solid #58a6ff;
+        color: #58a6ff !important;
+    }
+</style>
