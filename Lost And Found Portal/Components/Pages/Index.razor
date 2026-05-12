@@ -4,38 +4,46 @@
 @inject IItemService ItemService
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-white fw-bold">Recent <span class="text-info">Reports</span></h2>
-        <a href="/post-item" class="btn btn-info shadow-sm px-4">Report New Item</a>
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 obsidian-card shadow" style="border-bottom: 2px solid #0dcaf0; background: #161b22;">
+        <div>
+            <h1 class="text-white fw-bold mb-0">LOST & FOUND <span class="text-info">PORTAL</span></h1>
+            <small class="text-secondary">University Campus Security System</small>
+        </div>
+        <a href="/post-item" class="btn btn-info px-4 fw-bold shadow">Report Item</a>
+    </div>
+
+    <div class="mb-4">
+        <div class="input-group shadow-sm">
+            <span class="input-group-text bg-dark border-secondary text-info"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control bg-dark text-white border-secondary"
+                   placeholder="Search by title (e.g., Wallet, Phone...)"
+                   @bind="SearchTerm" @bind:event="oninput" @onkeyup="HandleSearch" />
+        </div>
     </div>
 
     <div class="row g-4">
-        @if (items == null)
+        @if (filteredItems == null)
         {
             <div class="col-12 text-center py-5">
                 <div class="spinner-border text-info" role="status"></div>
-                <p class="text-secondary mt-2">Fetching records...</p>
+                <p class="text-secondary mt-2">Loading items...</p>
             </div>
         }
-        else if (!items.Any())
+        else if (!filteredItems.Any())
         {
             <div class="col-12 text-center py-5">
-                <p class="text-secondary">No items reported yet. Be the first!</p>
+                <p class="text-secondary">No matching items found.</p>
             </div>
         }
         else
         {
-            @foreach (var item in items)
+            @foreach (var item in filteredItems)
             {
                 <div class="col-md-4">
-                    <div class="obsidian-card p-3 h-100 border-start border-info border-4 shadow-lg"
-                         style="background: #161b22; border-radius: 8px;">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge @(item.Status == "Lost" ? "bg-danger" : "bg-success")">@item.Status</span>
-                            <small class="text-muted">ID: #@item.Id</small>
-                        </div>
+                    <div class="obsidian-card p-3 h-100 border-start border-info border-4 shadow-lg" style="background: #1d2127;">
+                        <span class="badge @(item.Status == "Lost" ? "bg-danger" : "bg-success") mb-2">@item.Status</span>
                         <h5 class="text-white fw-bold">@item.Title</h5>
-                        <p class="text-secondary mb-0">Category: <span class="text-light">@item.Category</span></p>
+                        <p class="text-secondary small">Category: @item.Category</p>
                     </div>
                 </div>
             }
@@ -44,11 +52,27 @@
 </div>
 
 @code {
-    private List<Item> items;
+    private List<Item> allItems;
+    private List<Item> filteredItems;
+    private string SearchTerm { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
-        // This calls the logic you just wrote in ItemService.cs
-        items = await ItemService.GetAllItemsAsync();
+        allItems = await ItemService.GetAllItemsAsync();
+        filteredItems = allItems;
+    }
+
+    private void HandleSearch()
+    {
+        if (string.IsNullOrWhiteSpace(SearchTerm))
+        {
+            filteredItems = allItems;
+        }
+        else
+        {
+            filteredItems = allItems
+                .Where(x => x.Title.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
     }
 }
