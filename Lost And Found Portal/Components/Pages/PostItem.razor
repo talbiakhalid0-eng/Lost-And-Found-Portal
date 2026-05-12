@@ -4,6 +4,7 @@
 @using Lost_And_Found_Portal.Components.Data
 @inject IItemService ItemService
 @inject NavigationManager Nav
+@rendermode InteractiveServer
 
 <div class="container mt-5">
     <div class="obsidian-card p-4 shadow-lg border-info">
@@ -48,10 +49,26 @@
 
     private async Task HandleSubmit()
     {
-        var success = await ItemService.CreateItemAsync(newItem);
-        if (success)
+        Console.WriteLine("Submit button clicked!"); // Check if this shows in VS Output
+
+        try
         {
-            Nav.NavigateTo("/");
+            var success = await ItemService.CreateItemAsync(newItem);
+
+            if (success)
+            {
+                Console.WriteLine("Save successful! Redirecting...");
+                Nav.NavigateTo("/");
+            }
+            else
+            {
+                Console.WriteLine("Database save returned false. Check your connection.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // This will catch SQL errors like "Permission Denied" or "SSL Trust"
+            Console.WriteLine($"CRITICAL ERROR: {ex.Message}");
         }
     }
 }
