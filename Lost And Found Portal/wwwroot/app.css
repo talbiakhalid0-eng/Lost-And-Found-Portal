@@ -1,28 +1,45 @@
-/* Reset the default Blazor 'page' flexbox */
-.page {
-	display: block !important;
-}
-
+/* Reset and Typography */
 body {
-	background-color: #ffffff; /* Or keep #0b0e11 if you want the dark version */
-	margin: 0;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background-color: #f8f9fa;
+	color: #333;
 }
 
-.navbar {
-	height: 70px;
+/* Hero Section */
+.hero-section {
+	position: relative;
+	height: 80vh;
+	min-height: 500px;
+	background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2070'); /* Replace with your University Image URL */
+	background-size: cover;
+	background-position: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	text-align: center;
 }
 
-.nav-link {
-	font-weight: 500;
-	transition: color 0.2s;
+/* Glassmorphism Navbar */
+.navbar-custom {
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(10px);
+	border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-	.nav-link:hover {
-		color: #0dcaf0 !important;
+.feature-card {
+	border: none;
+	transition: transform 0.3s;
+	background: white;
+	border-radius: 15px;
+}
+
+	.feature-card:hover {
+		transform: translateY(-10px);
 	}
 
-/* Make the main content area look nice */
-main .container {
-	max-width: 1100px;
-	margin: 0 auto;
+footer {
+	background: #212529;
+	color: white;
+	padding: 3rem 0;
 }
