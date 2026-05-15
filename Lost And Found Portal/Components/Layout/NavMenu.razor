@@ -1,17 +1,9 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm px-4" style="background-color: #003366;">
-    <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
-            <i class="bi bi-airplane-engines me-2 text-info"></i>
-            <span>AU KHARIAN <span class="text-info">PORTAL</span></span>
-        </a>
+﻿<div class="ms-auto d-flex align-items-center">
+    @* Added fw-bold and fs-5 to match the NavLinks exactly *@
+    <a class="nav-link text-white px-3 fw-bold fs-5" href="/#how-it-works" style="cursor: pointer;">How It Works?</a>
 
+    <NavLink class="nav-link text-white px-3 fw-bold fs-5" href="report-case">Report Case</NavLink>
+    <NavLink class="nav-link text-white px-3 fw-bold fs-5" href="dashboard">Browse Items</NavLink>
 
-        <div class="ms-auto d-flex align-items-center">
-            @* In NavMenu.razor, replace the link with this exactly *@
-            <a class="nav-link text-white px-3 fw-bold fs-5" href="/#how-it-works">How It Works?</a>
-            <NavLink class="nav-link text-white px-3" href="report-case">Report Case</NavLink>
-            <NavLink class="nav-link text-white px-3" href="dashboard">Browse Items</NavLink>
-            <a href="login" class="btn btn-info rounded-pill ms-3 px-4 fw-bold">Sign In</a>
-        </div>
-    </div>
-</nav>
+    <a href="login" class="btn btn-info rounded-pill ms-4 px-5 py-2 fw-bold fs-5 shadow">Sign In</a>
+</div>
