@@ -11,5 +11,6 @@
 		public string Status { get; set; } = "Unclaimed";
 		public string ContactInfo { get; set; } = string.Empty;
 		public string UserId { get; set; } = string.Empty;
+		public DateTime DatePosted { get; set; } = DateTime.Now;
 	}
 }
