@@ -1,22 +1,37 @@
 /* Hero Section Setup */
 .hero-wrap {
-	height: 75vh;
-	/* Corrected: Removed 'wwwroot' and fixed the double url() syntax */
-	background: linear-gradient(rgba(0, 51, 102, 0.7), rgba(0, 51, 102, 0.7)), url('/Images/Uploads/au-kharian-campus.jpg');
+	/* Height changed to 100vh to fill the whole screen */
+	height: 100vh;
+	background-image: url('../Images/Uploads/au-kharian-campus.jpg');
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	margin-top: -70px; /* Pulls image up behind the sticky nav */
 }
 
-/* Hero Text Box Effect */
+/* Make the text box inside the hero bigger and more readable */
 .hero-content {
-	background: rgba(0, 0, 0, 0.3);
-	backdrop-filter: blur(10px);
-	border: 1px solid rgba(255,255,255,0.1);
+	background: rgba(0, 0, 0, 0.4);
+	padding: 4rem 5rem; /* Increased padding for a bigger feel */
+	border-radius: 25px;
+	backdrop-filter: blur(5px);
+	width: 80%; /* Makes the box wider */
+	max-width: 900px;
 }
+
+	.hero-content h1 {
+		font-size: 5rem !important; /* Huge, bold title */
+		font-weight: 800;
+		margin-bottom: 1.5rem;
+	}
+
+	.hero-content p {
+		font-size: 1.5rem !important; /* Bigger subtitle */
+		margin-bottom: 2.5rem;
+	}
 
 /* Sticky Nav Customization */
 .sticky-top {
