@@ -13,4 +13,12 @@
     <Routes />
     <script src="_framework/blazor.web.js"></script>
 </body>
+<script>
+    window.scrollToElement = (elementId) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+</script>
 </html>

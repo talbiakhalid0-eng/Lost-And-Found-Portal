@@ -70,3 +70,7 @@
 	transition: 0.3s;
 	background-color: #f0f8ff !important;
 }
+
+html {
+	scroll-behavior: smooth;
+}
