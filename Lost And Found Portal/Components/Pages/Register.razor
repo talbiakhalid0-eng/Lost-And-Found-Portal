@@ -1,0 +1,57 @@
+﻿@page "/register"
+@using Lost_And_Found_Portal.Components.Models
+@inject IItemService AuthService
+@inject NavigationManager Nav
+
+<div class="auth-wrapper">
+    <div class="auth-card shadow-lg border-0 rounded-4 p-5">
+        <h2 class="fw-bold text-center text-navy mb-4">Create AU Account</h2>
+
+        <EditForm Model="regModel" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Official AU Email</label>
+                <InputText @bind-Value="regModel.Email" class="form-control rounded-pill" placeholder="username@mail.au.edu.pk" />
+                <ValidationMessage For="@(() => regModel.Email)" class="text-danger small" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Password</label>
+                <InputText @bind-Value="regModel.Password" type="password" class="form-control rounded-pill" />
+                <ValidationMessage For="@(() => regModel.Password)" class="text-danger small" />
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Confirm Password</label>
+                <InputText @bind-Value="regModel.ConfirmPassword" type="password" class="form-control rounded-pill" />
+                <ValidationMessage For="@(() => regModel.ConfirmPassword)" class="text-danger small" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger small p-2">@errorMessage</div>
+            }
+
+            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2">Create Account</button>
+
+            <div class="text-center mt-3">
+                <a href="/login" class="text-decoration-none small text-muted">Already have an account? Sign In</a>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private RegisterModel regModel = new();
+    private string errorMessage;
+
+    private async Task HandleRegister()
+    {
+        var success = await AuthService.RegisterUserAsync(regModel);
+        if (success)
+            Nav.NavigateTo("/login");
+        else
+            errorMessage = "This email is already registered.";
+    }
+}
