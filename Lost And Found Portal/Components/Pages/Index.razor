@@ -31,8 +31,11 @@
         }
         else if (!filteredItems.Any())
         {
-            <div class="col-12 text-center py-5">
-                <p class="text-secondary">No matching items found.</p>
+            <div class="col-12 text-center py-5 obsidian-card mt-4">
+                <i class="bi bi-clipboard-x display-1 text-secondary mb-3"></i>
+                <h3 class="text-white">No Items Reported</h3>
+                <p class="text-secondary">All clear! No lost or found items match your search.</p>
+                <a href="/post-item" class="btn btn-info mt-2">Report an Item</a>
             </div>
         }
         else
@@ -88,13 +91,12 @@
         }
     }
 
-    // THIS IS THE MISSING METHOD THAT FIXES THE RED LINE:
     private async Task DeleteItem(int id)
     {
         var success = await ItemService.DeleteItemAsync(id);
         if (success)
         {
-            await LoadData(); // Refresh the list
+            await LoadData(); 
         }
     }
 }
