@@ -1,26 +1,26 @@
-﻿<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+﻿<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 shadow-sm">
+    <div class="container-fluid">
+        @* Logo Area *@
+        <a class="navbar-brand fw-bold text-info" href="#">
+            <i class="bi bi-shield-check"></i> CERTO PORTAL
+        </a>
+
+        @* Links Area (Horizontal) *@
+        <div class="d-flex align-items-center ms-auto">
+            <NavLink class="nav-link text-light px-3" href="" Match="NavLinkMatch.All">
+                How It Works?
             </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="post-item">
-                <i class="bi bi-plus-circle me-2"></i> Report Item
+            <NavLink class="nav-link text-light px-3" href="features">
+                Features
             </NavLink>
+            <NavLink class="nav-link text-light px-3" href="post-item">
+                Report Item
+            </NavLink>
+
+            @* The "Sign Up" Button Look *@
+            <a href="login" class="btn btn-outline-info rounded-pill ms-3 px-4">
+                Sign In
+            </a>
         </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    // This creates the string "collapse" when the menu should be hidden
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+    </div>
+</nav>
