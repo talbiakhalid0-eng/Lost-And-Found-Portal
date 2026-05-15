@@ -13,8 +13,6 @@ namespace Lost_And_Found_Portal.Services
 		{
 			_context = context;
 		}
-
-		// Feature: Create/Post a New Item
 		public async Task<bool> CreateItemAsync(Item item)
 		{
 			try
@@ -41,6 +39,12 @@ namespace Lost_And_Found_Portal.Services
 			if (item == null) return false;
 
 			_context.Items.Remove(item);
+			return await _context.SaveChangesAsync() > 0;
+		}
+
+		public async Task<bool> UpdateItemAsync(Item item)
+		{
+			_context.Items.Update(item);
 			return await _context.SaveChangesAsync() > 0;
 		}
 	}

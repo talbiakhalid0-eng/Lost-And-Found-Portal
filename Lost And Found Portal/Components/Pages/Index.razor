@@ -100,4 +100,11 @@
             await LoadData(); 
         }
     }
+
+    private async Task ToggleStatus(Item item)
+    {
+        item.Status = (item.Status == "Lost") ? "Found" : "Lost";
+        await ItemService.UpdateItemAsync(item);
+        await LoadData(); 
+    }
 }
