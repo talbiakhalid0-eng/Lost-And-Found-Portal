@@ -44,17 +44,18 @@
             {
                 <div class="col-md-4">
                     <div class="obsidian-card p-4 h-100 border-start border-info border-4 shadow-lg" style="background: #1d2127; position: relative;">
+                        <span class="badge @(item.Status == "Lost" ? "bg-danger shadow-danger" : "bg-success shadow-success") mb-3">
+                            @item.Status
+                        </span>
+                        <h4 class="text-white fw-bold">@item.Title</h4>
+                        <p class="text-info mb-1">@item.Category</p>
+                        <p class="text-secondary small">Posted on: @DateTime.Now.ToShortDateString()</p>
 
                         <button class="btn btn-sm text-secondary p-0"
                                 style="position: absolute; top: 10px; right: 15px;"
                                 @onclick="() => DeleteItem(item.Id)">
                             <i class="bi bi-trash-fill hover-danger"></i>
                         </button>
-
-                        <span class="badge @(item.Status == "Lost" ? "bg-danger" : "bg-success") mb-3">@item.Status</span>
-                        <h4 class="text-white fw-bold">@item.Title</h4>
-                        <p class="text-info mb-1">@item.Category</p>
-                        <p class="text-secondary small">Posted on: @DateTime.Now.ToShortDateString()</p>
                     </div>
                 </div>
             }
