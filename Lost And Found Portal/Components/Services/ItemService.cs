@@ -30,7 +30,7 @@ namespace Lost_And_Found_Portal.Services
 		// Feature: Get All Items for the Dashboard
 		public async Task<List<Item>> GetAllItemsAsync()
 		{
-			return await _context.Items.OrderByDescending(x => x.Id).ToListAsync();
+			return await _context.Items.ToListAsync();
 		}
 
 		public async Task<bool> DeleteItemAsync(int id)
