@@ -9,5 +9,7 @@ namespace Lost_And_Found_Portal.Services
 		Task<bool> DeleteItemAsync(int id);
 		Task<bool> UpdateItemAsync(Item item);
 		Task<bool> RegisterUserAsync(RegisterModel model);
+
+		Task<bool> LoginUserAsync(string email, string password);
 	}
 }

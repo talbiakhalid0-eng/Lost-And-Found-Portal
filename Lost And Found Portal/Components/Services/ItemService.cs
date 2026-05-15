@@ -84,5 +84,14 @@ namespace Lost_And_Found_Portal.Services
 			}
 		}
 
+		public async Task<bool> LoginUserAsync(string email, string password)
+		{
+			// Look for a user in the DB that matches both email AND password
+			var user = await _context.Users
+				.FirstOrDefaultAsync(u => u.Email == email && u.PasswordHash == password);
+
+			return user != null; // Returns true if found, false if not
+		}
+
 	}
 }

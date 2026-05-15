@@ -2,6 +2,7 @@
 @using Lost_And_Found_Portal.Components.Models
 @using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager Nav
+@inject Lost_And_Found_Portal.Services.IItemService AuthService
 
 <div class="auth-wrapper">
     <div class="auth-card shadow-lg border-0 rounded-4 p-5">
@@ -29,6 +30,11 @@
                 <ValidationMessage For="@(() => registerModel.Password)" class="text-danger small mt-1" />
             </div>
 
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger small py-2 text-center">@errorMessage</div>
+            }
+
             <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2 mt-3 shadow-sm">
                 Sign In
             </button>
@@ -44,13 +50,25 @@
 </div>
 
 @code {
-    // Added SupplyParameterFromForm and changed to a Property
     [SupplyParameterFromForm]
     private RegisterModel registerModel { get; set; } = new();
 
-    private void HandleRegistration()
+    private string? errorMessage;
+
+    private async Task HandleRegistration()
     {
-        // This is where you'll later add code to check the password against the DB
-        Nav.NavigateTo("/dashboard");
+        // 1. Check if the user exists in the DB with this email and password
+        var isValidUser = await AuthService.LoginUserAsync(registerModel.Email, registerModel.Password);
+
+        if (isValidUser)
+        {
+            // 2. Success! Send them to the dashboard
+            Nav.NavigateTo("/dashboard");
+        }
+        else
+        {
+            // 3. Fail! Stay on page and show error
+            errorMessage = "Invalid AU credentials. Please check your email or password.";
+        }
     }
 }
