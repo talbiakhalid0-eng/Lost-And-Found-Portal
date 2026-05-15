@@ -6,5 +6,6 @@ namespace Lost_And_Found_Portal.Services
 	{
 		Task<bool> CreateItemAsync(Item item);
 		Task<List<Item>> GetAllItemsAsync();
+		Task<bool> DeleteItemAsync(int id);
 	}
 }
