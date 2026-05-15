@@ -4,14 +4,14 @@
 	/* 100vh means it will take up the full height of the browser window */
 	height: 100vh;
 	background-image: url('../Images/Uploads/au-kharian-campus.jpg');
-	background-size: cover;
+	background-size:cover;
 	background-position: center;
 	background-attachment: fixed;
 	display: flex;
 	align-items: center; /* Keeps the box vertically centered */
 	justify-content: center;
 	position: relative;
-	margin-top: -70px; /* Adjust this based on your navbar height */
+	margin-top: -50px; /* Adjust this based on your navbar height */
 }
 
 .hero-content {
@@ -20,7 +20,7 @@
 	width: 80%;
 	max-width: 850px;
 	background: rgba(0, 0, 0, 0.4);
-	backdrop-filter: blur(2px);
+	backdrop-filter: blur(1px);
 	border-radius: 25px;
 	padding: 4rem; /* Controls the size of the box around the text */
 	border: 1px solid rgba(255, 255, 255, 0.1);
@@ -29,6 +29,27 @@
 		text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
 	}
 
+/* Make the brand text stand out */
+.brand-text span {
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+/* Fix nav-link hover states so they don't just stay white */
+.nav-link {
+	transition: color 0.3s ease;
+}
+
+	.nav-link:hover {
+		color: #0dcaf0 !important; /* AU Light Blue */
+	}
+
+/* If you want to try making the logo transparent via CSS: */
+.logo-filter {
+	/* This tries to remove white backgrounds - use only if not using the 'white box' method */
+	mix-blend-mode: multiply;
+	filter: contrast(120%);
+}
 /* Sticky Nav Customization */
 .sticky-top {
 	backdrop-filter: blur(8px);

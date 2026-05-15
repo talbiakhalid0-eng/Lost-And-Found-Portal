@@ -6,69 +6,40 @@
 @inject NavigationManager Nav
 @rendermode InteractiveServer
 
-<div class="container mt-5">
-    <div class="obsidian-card p-4 shadow-lg border-info">
-        <h2 class="text-info mb-4 fw-bold">Report Lost/Found Item</h2>
-
-        <EditForm Model="@newItem" OnValidSubmit="HandleSubmit" FormName="PostItemForm">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger mb-3" />
-
+<div class="container mt-5 pt-5">
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <h2 class="fw-bold text-navy">Submit a Report</h2>
+        <EditForm Model="newItem" OnValidSubmit="HandleSubmit">
             <div class="mb-3">
-                <label class="form-label text-secondary">Item Title</label>
-                <InputText @bind-Value="newItem.Title" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Blue Wallet" />
+                <label>Item Name</label>
+                <InputText @bind-Value="newItem.Title" class="form-control" />
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label class="form-label text-secondary">Category</label>
-                    <InputSelect @bind-Value="newItem.Category" class="form-select bg-dark text-white border-secondary">
-                        <option value="">Select Category</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Documents">Documents</option>
-                        <option value="Personal">Personal Items</option>
+                    <label>Type</label>
+                    <InputSelect @bind-Value="newItem.IsLost" class="form-select">
+                        <option value="true">I Lost Something</option>
+                        <option value="false">I Found Something</option>
                     </InputSelect>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label text-secondary">Status</label>
-                    <InputSelect @bind-Value="newItem.Status" class="form-select bg-dark text-white border-secondary">
-                        <option value="Lost">Lost</option>
-                        <option value="Found">Found</option>
-                    </InputSelect>
+                    <label>Location (at AU Kharian)</label>
+                    <InputText @bind-Value="newItem.Location" class="form-control" placeholder="e.g. Admin Block" />
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-info w-100 py-2 fw-bold mt-3 shadow">Submit Report</button>
+            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold">Post Report</button>
         </EditForm>
     </div>
 </div>
 
 @code {
-    [SupplyParameterFromForm]
-    private Item newItem { get; set; } = new();
+    private Item newItem = new();
 
     private async Task HandleSubmit()
     {
-        Console.WriteLine("Submit button clicked!"); // Check if this shows in VS Output
-
-        try
-        {
-            var success = await ItemService.CreateItemAsync(newItem);
-
-            if (success)
-            {
-                Console.WriteLine("Save successful! Redirecting...");
-                Nav.NavigateTo("/");
-            }
-            else
-            {
-                Console.WriteLine("Database save returned false. Check your connection.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // This will catch SQL errors like "Permission Denied" or "SSL Trust"
-            Console.WriteLine($"CRITICAL ERROR: {ex.Message}");
-        }
+        await ItemService.CreateItemAsync(newItem);
+        Nav.NavigateTo("/dashboard");
     }
 }
