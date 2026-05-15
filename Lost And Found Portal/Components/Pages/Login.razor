@@ -1,6 +1,6 @@
 ﻿@page "/login"
 @using Lost_And_Found_Portal.Components.Models
-@using Microsoft.AspNetCore.Components.Forms 
+@using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager Nav
 
 <div class="auth-wrapper">
@@ -42,6 +42,9 @@
                     <a href="/register" class="text-info fw-bold text-decoration-none">Register here</a>
                 </p>
             </div>
+        </EditForm> @* Fixed: Added missing closing tag *@
+    </div> @* Fixed: Added missing closing tag *@
+</div> @* Fixed: Added missing closing tag *@
 
 @code {
     private RegisterModel registerModel = new();
