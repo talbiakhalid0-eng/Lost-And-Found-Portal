@@ -8,7 +8,8 @@
     <div class="auth-card shadow-lg border-0 rounded-4 p-5">
         <h2 class="fw-bold text-center text-navy mb-4">Create AU Account</h2>
 
-        <EditForm Model="regModel" OnValidSubmit="HandleRegister">
+        @* Added FormName here *@
+        <EditForm Model="regModel" OnValidSubmit="HandleRegister" FormName="registerForm">
             <DataAnnotationsValidator />
 
             <div class="mb-3">
@@ -44,24 +45,23 @@
 </div>
 
 @code {
-    private RegisterModel regModel = new();
+    // Added SupplyParameterFromForm attribute
+    [SupplyParameterFromForm]
+    private RegisterModel regModel { get; set; } = new();
+
     private string? errorMessage;
 
     private async Task HandleRegister()
     {
-        // Call the service to save to the database
         var result = await AuthService.RegisterUserAsync(regModel);
 
         if (result)
         {
-            // If successful, send them to login
             Nav.NavigateTo("/login");
         }
         else
         {
-            // If failed (email exists or DB error)
             errorMessage = "Registration failed. This email may already be in use.";
         }
     }
-}
 }
