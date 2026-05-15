@@ -40,10 +40,18 @@
             @foreach (var item in filteredItems)
             {
                 <div class="col-md-4">
-                    <div class="obsidian-card p-3 h-100 border-start border-info border-4 shadow-lg" style="background: #1d2127;">
-                        <span class="badge @(item.Status == "Lost" ? "bg-danger" : "bg-success") mb-2">@item.Status</span>
-                        <h5 class="text-white fw-bold">@item.Title</h5>
-                        <p class="text-secondary small">Category: @item.Category</p>
+                    <div class="obsidian-card p-4 h-100 border-start border-info border-4 shadow-lg" style="background: #1d2127; position: relative;">
+
+                        <button class="btn btn-sm text-secondary p-0"
+                                style="position: absolute; top: 10px; right: 15px;"
+                                @onclick="() => DeleteItem(item.Id)">
+                            <i class="bi bi-trash-fill hover-danger"></i>
+                        </button>
+
+                        <span class="badge @(item.Status == "Lost" ? "bg-danger" : "bg-success") mb-3">@item.Status</span>
+                        <h4 class="text-white fw-bold">@item.Title</h4>
+                        <p class="text-info mb-1">@item.Category</p>
+                        <p class="text-secondary small">Posted on: @DateTime.Now.ToShortDateString()</p>
                     </div>
                 </div>
             }
@@ -73,6 +81,16 @@
             filteredItems = allItems
                 .Where(x => x.Title.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList();
+        }
+    }
+
+    private async Task DeleteItem(int id)
+    {
+        var success = await ItemService.DeleteItemAsync(id);
+        if (success)
+        {
+            allItems = await ItemService.GetAllItemsAsync();
+            HandleSearch();
         }
     }
 }
