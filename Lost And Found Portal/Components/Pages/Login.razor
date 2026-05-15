@@ -41,18 +41,9 @@
                 <div class="alert alert-danger small py-2 text-center">@errorMessage</div>
             }
 
-            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2 mt-3 shadow-sm"
-                    disabled='@(errorMessage == "Verifying credentials...")'>
-                @if (errorMessage == "Verifying credentials...")
-                {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span> Checking...</span>
-                }
-                else
-                {
-                    <span>Sign In</span>
-                }
-            </button>
+            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2 mt-3 shadow-sm">
+    Sign In
+</button>
 
             <div class="text-center mt-3">
                 <p class="small text-muted mb-0">
@@ -66,9 +57,14 @@
 
 @code {
     [SupplyParameterFromForm]
-    private RegisterModel registerModel { get; set; } = new();
+    private RegisterModel? registerModel { get; set; }
 
     private string? errorMessage;
+    protected override void OnInitialized()
+    {
+        // Initialize here instead to satisfy the Blazor compiler
+        registerModel ??= new();
+    }
 
     private async Task HandleLogin()
     {
@@ -89,7 +85,7 @@
                 await Task.Delay(500);
 
                 // 3. forceLoad: true is the "Magic Fix" for .NET 8 navigation hangs
-                Nav.NavigateTo("/dashboard", forceLoad: true);
+                Nav.NavigateTo(Nav.BaseUri + "dashboard", forceLoad: true);
             }
             else
             {
