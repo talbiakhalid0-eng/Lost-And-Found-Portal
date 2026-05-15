@@ -74,3 +74,28 @@
 html {
 	scroll-behavior: smooth;
 }
+
+.auth-wrapper {
+	height: 90vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f8f9fa; /* Clean light background */
+}
+
+.auth-card {
+	background: white;
+	width: 100%;
+	max-width: 450px;
+	border: 1px solid rgba(0,0,0,0.05);
+}
+
+.text-navy {
+	color: #003366;
+}
+
+/* Custom focus ring for university branding */
+.auth-card .form-control:focus {
+	border-color: #0dcaf0;
+	box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
+}
