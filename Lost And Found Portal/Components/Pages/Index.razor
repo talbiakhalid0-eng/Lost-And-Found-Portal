@@ -58,7 +58,6 @@
         }
     </div>
 </div>
-
 @code {
     private List<Item> allItems;
     private List<Item> filteredItems;
@@ -66,8 +65,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
         allItems = await ItemService.GetAllItemsAsync();
-        filteredItems = allItems;
+        HandleSearch();
     }
 
     private void HandleSearch()
@@ -84,13 +88,13 @@
         }
     }
 
+    // THIS IS THE MISSING METHOD THAT FIXES THE RED LINE:
     private async Task DeleteItem(int id)
     {
         var success = await ItemService.DeleteItemAsync(id);
         if (success)
         {
-            allItems = await ItemService.GetAllItemsAsync();
-            HandleSearch();
+            await LoadData(); // Refresh the list
         }
     }
 }
