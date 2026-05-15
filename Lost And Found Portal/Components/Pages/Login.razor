@@ -13,7 +13,7 @@
             <p class="text-muted">Enter your official university credentials</p>
         </div>
 
-        <EditForm Model="registerModel" OnValidSubmit="HandleLogin" FormName="loginForm">
+       <EditForm Model="registerModel" OnValidSubmit="HandleLogin" FormName="loginForm" @onsubmit:preventDefault>
             <DataAnnotationsValidator />
 
             <div class="mb-3">
@@ -41,8 +41,17 @@
                 <div class="alert alert-danger small py-2 text-center">@errorMessage</div>
             }
 
-            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2 mt-3 shadow-sm">
-                Sign In
+            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2 mt-3 shadow-sm"
+                    disabled='@(errorMessage == "Verifying credentials...")'>
+                @if (errorMessage == "Verifying credentials...")
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span> Checking...</span>
+                }
+                else
+                {
+                    <span>Sign In</span>
+                }
             </button>
 
             <div class="text-center mt-3">
@@ -63,15 +72,34 @@
 
     private async Task HandleLogin()
     {
-        var success = await AuthService.LoginUserAsync(registerModel.Email, registerModel.Password);
+        // 1. Clear previous errors and show status
+        errorMessage = "Verifying credentials...";
+        StateHasChanged();
 
-        if (success)
+        try
         {
-            Nav.NavigateTo("/dashboard");
+            var success = await AuthService.LoginUserAsync(registerModel.Email, registerModel.Password);
+
+            if (success)
+            {
+                errorMessage = "Login successful! Redirecting...";
+                StateHasChanged();
+
+                // 2. Small delay ensures the UI updates before the redirect starts
+                await Task.Delay(500);
+
+                // 3. forceLoad: true is the "Magic Fix" for .NET 8 navigation hangs
+                Nav.NavigateTo("/dashboard", forceLoad: true);
+            }
+            else
+            {
+                errorMessage = "Invalid AU email or password.";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            errorMessage = "Invalid AU email or password.";
+            // This helps you catch database connection issues (like SQLEXPRESS being asleep)
+            errorMessage = $"Connection error: {ex.Message}";
         }
     }
 }
