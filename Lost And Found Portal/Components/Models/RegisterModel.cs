@@ -1,4 +1,5 @@
-﻿namespace Lost_And_Found_Portal.Components.Models
+﻿using System.ComponentModel.DataAnnotations;
+namespace Lost_And_Found_Portal.Components.Models
 {
     public class RegisterModel
     {
