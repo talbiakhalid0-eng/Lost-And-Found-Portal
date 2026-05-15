@@ -57,16 +57,15 @@ namespace Lost_And_Found_Portal.Services
 
 		public async Task<bool> RegisterUserAsync(RegisterModel model)
 		{
-			// Check if user already exists
-			var existingUser = await _context.Users.AnyAsync(u => u.Email == model.Email);
-			if (existingUser) return false;
+			// Check if email already exists
+			var userExists = await _context.Users.AnyAsync(u => u.Email == model.Email);
+			if (userExists) return false;
 
-			// Create new user entity (Mapping from your RegisterModel)
 			var newUser = new User
 			{
 				Email = model.Email,
-				PasswordHash = model.Password, // In a real app, use BCrypt to hash this!
-				Role = "Student"
+				// Note: For a real app, hash this password!
+				PasswordHash = model.Password
 			};
 
 			_context.Users.Add(newUser);

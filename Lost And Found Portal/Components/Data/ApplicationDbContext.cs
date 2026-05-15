@@ -10,5 +10,7 @@ namespace Lost_And_Found_Portal.Components.Data
 		: base(options) { }
 
 		public DbSet<Item> Items { get; set; }
+
+		public DbSet<User> Users { get; set; }
 	}
 }
