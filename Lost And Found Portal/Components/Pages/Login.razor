@@ -11,7 +11,8 @@
             <p class="text-muted">Enter your official university credentials</p>
         </div>
 
-        <EditForm Model="registerModel" OnValidSubmit="HandleRegistration">
+        @* Added FormName="loginForm" *@
+        <EditForm Model="registerModel" OnValidSubmit="HandleRegistration" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="mb-3">
@@ -33,7 +34,7 @@
             </div>
 
             <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2 mt-3 shadow-sm">
-                Sign In / Register
+                Sign In
             </button>
 
             <div class="text-center mt-3">
@@ -42,16 +43,18 @@
                     <a href="/register" class="text-info fw-bold text-decoration-none">Register here</a>
                 </p>
             </div>
-        </EditForm> @* Fixed: Added missing closing tag *@
-    </div> @* Fixed: Added missing closing tag *@
-</div> @* Fixed: Added missing closing tag *@
+        </EditForm>
+    </div>
+</div>
 
 @code {
-    private RegisterModel registerModel = new();
+    // Added SupplyParameterFromForm and changed to a Property
+    [SupplyParameterFromForm]
+    private RegisterModel registerModel { get; set; } = new();
 
     private void HandleRegistration()
     {
-        // Logic for checking existing user or creating a new one goes here
+        // This is where you'll later add code to check the password against the DB
         Nav.NavigateTo("/dashboard");
     }
 }
