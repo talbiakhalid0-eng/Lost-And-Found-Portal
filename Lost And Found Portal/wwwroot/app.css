@@ -1,36 +1,32 @@
 /* Hero Section Setup */
 .hero-wrap {
-	/* Height changed to 100vh to fill the whole screen */
+	/* Increase this value to make the background taller */
+	/* 100vh means it will take up the full height of the browser window */
 	height: 100vh;
 	background-image: url('../Images/Uploads/au-kharian-campus.jpg');
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
 	display: flex;
-	align-items: center;
+	align-items: center; /* Keeps the box vertically centered */
 	justify-content: center;
-	margin-top: -70px; /* Pulls image up behind the sticky nav */
+	position: relative;
+	margin-top: -70px; /* Adjust this based on your navbar height */
 }
 
-/* Make the text box inside the hero bigger and more readable */
 .hero-content {
+	/* Change 'height' to 'auto' or 'min-height' so it doesn't grow with the background */
+	height: auto !important;
+	width: 80%;
+	max-width: 850px;
 	background: rgba(0, 0, 0, 0.4);
-	padding: 4rem 5rem; /* Increased padding for a bigger feel */
+	backdrop-filter: blur(2px);
 	border-radius: 25px;
-	backdrop-filter: blur(5px);
-	width: 80%; /* Makes the box wider */
-	max-width: 900px;
+	padding: 4rem; /* Controls the size of the box around the text */
+	border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-	.hero-content h1 {
-		font-size: 5rem !important; /* Huge, bold title */
-		font-weight: 800;
-		margin-bottom: 1.5rem;
-	}
-
-	.hero-content p {
-		font-size: 1.5rem !important; /* Bigger subtitle */
-		margin-bottom: 2.5rem;
+	.hero-content h1, .hero-content p {
+		text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
 	}
 
 /* Sticky Nav Customization */
