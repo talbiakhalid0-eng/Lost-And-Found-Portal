@@ -1,16 +1,18 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page" style="background-color: #0d1117; color: #c9d1d9; min-height: 100vh; display: flex;">
-    <div class="sidebar" style="width: 250px; background: #161b22; border-right: 1px solid #30363d;">
+<div class="page">
+    @* Feature #11: Collapsible Sidebar Container *@
+    <div class="sidebar shadow-lg">
         <NavMenu />
     </div>
 
-    <main style="flex-grow: 1; overflow-y: auto;">
-        <div class="top-row px-4" style="background: #161b22; border-bottom: 1px solid #30363d; height: 3.5rem; display: flex; align-items: center;">
-            <span class="text-info fw-bold">Admin Dashboard</span>
+    <main>
+        <div class="top-row px-4 border-bottom bg-dark">
+            <span class="text-info small fw-bold">CERTO SECURITY PORTAL v1.0</span>
         </div>
 
         <article class="content px-4 py-3">
+            @* This is where your Index.razor content is injected *@
             @Body
         </article>
     </main>

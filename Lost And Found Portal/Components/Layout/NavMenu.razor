@@ -1,24 +1,26 @@
-﻿<div class="p-4">
-    <h4 class="text-white fw-bold mb-4">Certo <span class="text-info">Portal</span></h4>
-    <nav class="nav flex-column">
-        <NavLink class="nav-link text-light mb-2 p-2 rounded hover-effect" href="" Match="NavLinkMatch.All">
-            <i class="bi bi-speedometer2 me-2"></i> Dashboard
-        </NavLink>
-        <NavLink class="nav-link text-light mb-2 p-2 rounded hover-effect" href="post-item">
-            <i class="bi bi-plus-square me-2"></i> Report Item
-        </NavLink>
+﻿<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="post-item">
+                <i class="bi bi-plus-circle me-2"></i> Report Item
+            </NavLink>
+        </div>
     </nav>
 </div>
 
-<style>
-    .nav-link:hover {
-        background: #30363d;
-        color: #58a6ff !important;
-    }
+@code {
+    private bool collapseNavMenu = true;
 
-    .active {
-        background: #1f242c;
-        border-left: 4px solid #58a6ff;
-        color: #58a6ff !important;
+    // This creates the string "collapse" when the menu should be hidden
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
     }
-</style>
+}

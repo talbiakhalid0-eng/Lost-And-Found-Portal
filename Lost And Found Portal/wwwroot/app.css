@@ -1,43 +1,16 @@
-/* Premium Obsidian Theme */
-.obsidian-card {
-	background: #161b22;
-	border: 1px solid #30363d;
-	border-radius: 12px;
-	color: #c9d1d9;
-	transition: transform 0.2s, border-color 0.2s;
+/* If the 'collapse' class is present, hide the sidebar completely */
+.sidebar.collapse {
+	display: none !important;
 }
 
-	.obsidian-card:hover {
-		transform: translateY(-5px);
-		border-color: #0dcaf0;
+	/* Ensure the main content takes up 100% width when sidebar is hidden */
+	.sidebar.collapse + main {
+		width: 100%;
 	}
 
-body {
-	background-color: #0d1117 !important;
-	color: #c9d1d9;
-}
-
-.form-control, .form-select {
-	background-color: #0d1117 !important;
-	border: 1px solid #30363d !important;
-	color: #f0f6fc !important;
-}
-
-	.form-control:focus {
-		border-color: #0dcaf0 !important;
-		box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
-	}
-
-.text-info {
-	color: #58a6ff !important;
-}
-
-.shadow-danger {
-	box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
-	border: 1px solid #dc3545;
-}
-
-.shadow-success {
-	box-shadow: 0 0 10px rgba(25, 135, 84, 0.5);
-	border: 1px solid #198754;
+/* Basic styling to make sure the sidebar looks like a sidebar again */
+.sidebar {
+	background-image: linear-gradient(180deg, #1b2026 0%, #111417 100%);
+	width: 250px;
+	min-height: 100vh;
 }
