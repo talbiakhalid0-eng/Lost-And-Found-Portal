@@ -55,22 +55,34 @@ namespace Lost_And_Found_Portal.Services
 			return await _context.SaveChangesAsync() > 0;
 		}
 
+
 		public async Task<bool> RegisterUserAsync(RegisterModel model)
 		{
-			// Check if email already exists
-			var userExists = await _context.Users.AnyAsync(u => u.Email == model.Email);
-			if (userExists) return false;
-
-			var newUser = new User
+			try
 			{
-				Email = model.Email,
-				// Note: For a real app, hash this password!
-				PasswordHash = model.Password
-			};
+				// 1. Check if the email already exists in the DB
+				var alreadyExists = await _context.Users.AnyAsync(u => u.Email == model.Email);
+				if (alreadyExists) return false;
 
-			_context.Users.Add(newUser);
-			await _context.SaveChangesAsync();
-			return true;
+				// 2. Create the User object from the registration data
+				var newUser = new User
+				{
+					Email = model.Email,
+					PasswordHash = model.Password, // Ideally, use hashing here for security
+					Role = "Student"
+				};
+
+				// 3. Save to database
+				_context.Users.Add(newUser);
+				await _context.SaveChangesAsync();
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
+
 	}
 }

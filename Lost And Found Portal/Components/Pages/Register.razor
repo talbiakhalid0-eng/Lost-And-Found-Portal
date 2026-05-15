@@ -45,14 +45,23 @@
 
 @code {
     private RegisterModel regModel = new();
-    private string errorMessage;
+    private string? errorMessage;
 
     private async Task HandleRegister()
     {
-        var success = await AuthService.RegisterUserAsync(regModel);
-        if (success)
+        // Call the service to save to the database
+        var result = await AuthService.RegisterUserAsync(regModel);
+
+        if (result)
+        {
+            // If successful, send them to login
             Nav.NavigateTo("/login");
+        }
         else
-            errorMessage = "This email is already registered.";
+        {
+            // If failed (email exists or DB error)
+            errorMessage = "Registration failed. This email may already be in use.";
+        }
     }
+}
 }
