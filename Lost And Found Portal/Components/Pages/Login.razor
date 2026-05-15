@@ -13,7 +13,7 @@
             <p class="text-muted">Enter your official university credentials</p>
         </div>
 
-       <EditForm Model="registerModel" OnValidSubmit="HandleLogin" FormName="loginForm" @onsubmit:preventDefault>
+        <EditForm Model="registerModel" OnValidSubmit="HandleLogin" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="mb-3">
@@ -57,45 +57,34 @@
 
 @code {
     [SupplyParameterFromForm]
-    private RegisterModel? registerModel { get; set; }
+    public RegisterModel registerModel { get; set; } = default!; // Use default! to stop warnings
 
     private string? errorMessage;
+
     protected override void OnInitialized()
     {
-        // Initialize here instead to satisfy the Blazor compiler
-        registerModel ??= new();
+        // This ensures the model is ready before the page renders
+        registerModel ??= new RegisterModel();
     }
 
     private async Task HandleLogin()
     {
-        // 1. Clear previous errors and show status
-        errorMessage = "Verifying credentials...";
-        StateHasChanged();
-
-        try
+        // Check for null manually to satisfy warning CS8602
+        if (registerModel == null || string.IsNullOrEmpty(registerModel.Email))
         {
-            var success = await AuthService.LoginUserAsync(registerModel.Email, registerModel.Password);
-
-            if (success)
-            {
-                errorMessage = "Login successful! Redirecting...";
-                StateHasChanged();
-
-                // 2. Small delay ensures the UI updates before the redirect starts
-                await Task.Delay(500);
-
-                // 3. forceLoad: true is the "Magic Fix" for .NET 8 navigation hangs
-                Nav.NavigateTo(Nav.BaseUri + "dashboard", forceLoad: true);
-            }
-            else
-            {
-                errorMessage = "Invalid AU email or password.";
-            }
+            return;
         }
-        catch (Exception ex)
+
+        var success = await AuthService.LoginUserAsync(registerModel.Email, registerModel.Password);
+
+        if (success)
         {
-            // This helps you catch database connection issues (like SQLEXPRESS being asleep)
-            errorMessage = $"Connection error: {ex.Message}";
+            // Force a full redirect to bypass the POST state
+            Nav.NavigateTo("/dashboard", forceLoad: true);
+        }
+        else
+        {
+            errorMessage = "Invalid AU email or password.";
         }
     }
 }
