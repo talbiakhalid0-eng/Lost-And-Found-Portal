@@ -1,144 +1,69 @@
 ﻿@page "/"
-@using Lost_And_Found_Portal.Components.Models
-@using Lost_And_Found_Portal.Services
-@inject IItemService ItemService
 
-
-
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center my-4 p-4 obsidian-card shadow">
-        <div>
-            <h1 class="display-5 text-white fw-bold mb-0">LOST & FOUND <span class="text-info">PORTAL</span></h1>
-            <p class="text-secondary mb-0">University Campus Security System</p>
-        </div>
-        <a href="/post-item" class="btn btn-info btn-lg px-5 fw-bold">Report New Item</a>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="input-group">
-                <span class="input-group-text bg-dark border-secondary text-info"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control form-control-lg bg-dark text-white border-secondary"
-                       placeholder="Search by title..." @bind="SearchTerm" @bind:event="oninput" @onkeyup="HandleSearch" />
-            </div>
+@* Section 1: Hero Section *@
+<section class="hero-section">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-3">LOST & FOUND PORTAL</h1>
+        <p class="lead fs-4 mb-4">The official University Campus Security system for tracking and returning lost items.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="post-item" class="btn btn-primary btn-lg px-5 rounded-pill">Report Lost Item</a>
+            <button class="btn btn-outline-light btn-lg px-5 rounded-pill">Browse Items</button>
         </div>
     </div>
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="p-3 border border-info rounded bg-dark text-center shadow-sm">
-                <h6 class="text-secondary small mb-1">TOTAL REPORTS</h6>
-                <h3 class="text-white fw-bold mb-0">@(allItems?.Count ?? 0)</h3>
-            </div>
-        </div>
-    </div>
+</section>
 
-    <div class="d-flex gap-2 mb-3 overflow-auto pb-2">
-        <button class="btn btn-info btn-sm px-4" @onclick='() => FilterByCategory("All")'>All</button>
-        <button class="btn btn-outline-secondary btn-sm px-4" @onclick='() => FilterByCategory("Electronics")'>Electronics</button>
-        <button class="btn btn-outline-secondary btn-sm px-4" @onclick='() => FilterByCategory("Personal")'>Personal</button>
-    </div>
-
-    <div class="row g-4">
-        @if (filteredItems == null)
-        {
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-info" role="status"></div>
-                <p class="text-secondary mt-2">Loading items...</p>
-            </div>
-        }
-        else if (!filteredItems.Any())
-        {
-            <div class="col-12 text-center py-5 obsidian-card mt-4">
-                <i class="bi bi-clipboard-x display-1 text-secondary mb-3"></i>
-                <h3 class="text-white">No Items Reported</h3>
-                <p class="text-secondary">All clear! No lost or found items match your search.</p>
-                <a href="/post-item" class="btn btn-info mt-2">Report an Item</a>
-            </div>
-        }
-        else
-        {
-            @foreach (var item in filteredItems)
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="obsidian-card p-4 h-100 shadow-lg" style="background: #1d2127; position: relative; border-top: 4px solid #0dcaf0;">
-
-                        <button class="btn btn-sm btn-danger"
-                                style="position: absolute; top: 10px; right: 10px;"
-                                @onclick="() => DeleteItem(item.Id)">
-                            Delete
-                        </button>
-
-                        <span class="badge @(item.Status == "Lost" ? "bg-danger" : "bg-success") mb-2">@item.Status</span>
-                        <h4 class="text-white fw-bold">@item.Title</h4>
-                        <p class="text-info mb-1">@item.Category</p>
-
-                        <button class="btn btn-outline-light btn-sm mt-3 w-100" @onclick="() => ToggleStatus(item)">
-                            Change to @(item.Status == "Lost" ? "Found" : "Lost")
-                        </button>
-                    </div>
+@* Section 2: How It Works *@
+<section class="py-5 bg-white">
+    <div class="container py-5 text-center">
+        <h2 class="fw-bold mb-5">How It Works</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card p-4 shadow-sm h-100">
+                    <i class="bi bi-megaphone text-primary display-4 mb-3"></i>
+                    <h4>Report Item</h4>
+                    <p class="text-muted">Fill out a simple form with details and a photo of the lost or found item.</p>
                 </div>
-            }
-        }
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card p-4 shadow-sm h-100">
+                    <i class="bi bi-search text-primary display-4 mb-3"></i>
+                    <h4>We Match</h4>
+                    <p class="text-muted">Our system scans all reports to find potential matches automatically.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card p-4 shadow-sm h-100">
+                    <i class="bi bi-hand-thumbs-up text-primary display-4 mb-3"></i>
+                    <h4>Return</h4>
+                    <p class="text-muted">Coordinate a safe pickup through the Campus Security office.</p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-@code {
-    private List<Item> allItems;
-    private List<Item> filteredItems;
-    private string SearchTerm { get; set; } = "";
-    private string SelectedCategory { get; set; } = "All";
+</section>
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData();
-    }
-
-    private async Task LoadData()
-    {
-        allItems = await ItemService.GetAllItemsAsync();
-        HandleSearch();
-    }
-
-    private void HandleSearch()
-    {
-        if (string.IsNullOrWhiteSpace(SearchTerm))
-        {
-            filteredItems = allItems;
-        }
-        else
-        {
-            filteredItems = allItems
-                .Where(x => x.Title.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-    }
-
-    private async Task DeleteItem(int id)
-    {
-        var success = await ItemService.DeleteItemAsync(id);
-        if (success)
-        {
-            await LoadData(); 
-        }
-    }
-
-    private async Task ToggleStatus(Item item)
-    {
-        item.Status = (item.Status == "Lost") ? "Found" : "Lost";
-        await ItemService.UpdateItemAsync(item);
-        await LoadData(); 
-    }
-
-    private void FilterByCategory(string category)
-    {
-        SelectedCategory = category;
-
-        if (category == "All")
-        {
-            filteredItems = allItems;
-        }
-        else
-        {
-            filteredItems = allItems.Where(x => x.Category == category).ToList();
-        }
-    }
-}
+@* Section 3: Footer *@
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-bold mb-3">University Security</h5>
+                <p class="small text-secondary">Ensuring a safe and secure environment for our academic community 24/7.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-bold mb-3">Quick Links</h5>
+                <ul class="list-unstyled small">
+                    <li><a href="#" class="text-secondary text-decoration-none">Privacy Policy</a></li>
+                    <li><a href="#" class="text-secondary text-decoration-none">Terms of Service</a></li>
+                    <li><a href="#" class="text-secondary text-decoration-none">Contact Support</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-bold mb-3">Location</h5>
+                <p class="small text-secondary">Main Campus, Security Block A<br>Emergency: +1 (555) 000-1234</p>
+            </div>
+        </div>
+        <hr class="border-secondary my-4">
+        <p class="text-center small text-secondary">&copy; 2026 Certo University Security Management v1.0</p>
+    </div>
+</footer>
