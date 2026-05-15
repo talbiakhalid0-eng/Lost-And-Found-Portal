@@ -1,26 +1,15 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 shadow-sm">
-    <div class="container-fluid">
-        @* Logo Area *@
-        <a class="navbar-brand fw-bold text-info" href="#">
-            <i class="bi bi-shield-check"></i> CERTO PORTAL
+﻿<nav class="navbar navbar-expand-lg navbar-light navbar-custom sticky-top px-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+            <i class="bi bi-shield-lock-fill text-primary me-2 fs-3"></i>
+            <span>UNIVERSITY <span class="text-primary">PORTAL</span></span>
         </a>
 
-        @* Links Area (Horizontal) *@
-        <div class="d-flex align-items-center ms-auto">
-            <NavLink class="nav-link text-light px-3" href="" Match="NavLinkMatch.All">
-                How It Works?
-            </NavLink>
-            <NavLink class="nav-link text-light px-3" href="features">
-                Features
-            </NavLink>
-            <NavLink class="nav-link text-light px-3" href="post-item">
-                Report Item
-            </NavLink>
-
-            @* The "Sign Up" Button Look *@
-            <a href="login" class="btn btn-outline-info rounded-pill ms-3 px-4">
-                Sign In
-            </a>
+        <div class="ms-auto d-flex align-items-center">
+            <NavLink class="nav-link px-3 fw-semibold" href="how-it-works">How It Works?</NavLink>
+            <NavLink class="nav-link px-3 fw-semibold" href="post-item">Report Case</NavLink>
+            <NavLink class="nav-link px-3 fw-semibold" href="features">Dashboard</NavLink>
+            <a href="login" class="btn btn-primary rounded-pill px-4 ms-3 shadow-sm">Sign In</a>
         </div>
     </div>
 </nav>
