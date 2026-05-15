@@ -14,7 +14,9 @@
 
             <div class="mb-3">
                 <label class="form-label fw-bold">Official AU Email</label>
-                <InputText @bind-Value="regModel.Email" class="form-control rounded-pill" placeholder="username@mail.au.edu.pk" />
+                <InputText @bind-Value="regModel.Email"
+                           class="form-control rounded-pill"
+                           placeholder="247240@students.au.edu.pk" /> @* Updated placeholder *@
                 <ValidationMessage For="@(() => regModel.Email)" class="text-danger small" />
             </div>
 

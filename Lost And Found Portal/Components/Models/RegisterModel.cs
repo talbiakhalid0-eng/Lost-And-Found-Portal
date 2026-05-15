@@ -7,7 +7,7 @@ namespace Lost_And_Found_Portal.Components.Models
 		[EmailAddress(ErrorMessage = "Invalid email format")]
 		[Display(Name = "University Email")]
 		// This Regex ensures the email ends EXACTLY with @mail.au.edu.pk
-		[RegularExpression(@"^[a-zA-Z0-9._%+-]+@mail\.au\.edu\.pk$",
+		[RegularExpression(@"^[a-zA-Z0-9._%+-]+@students\.au\.edu\.pk$",
 			ErrorMessage = "Access denied. You must use your official AU student email (@mail.au.edu.pk).")]
 		public string Email { get; set; } = string.Empty;
 
