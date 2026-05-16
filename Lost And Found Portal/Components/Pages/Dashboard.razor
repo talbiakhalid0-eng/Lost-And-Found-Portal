@@ -7,18 +7,30 @@
 @inject NavigationManager Nav
 @rendermode RenderMode.InteractiveServer
 
-<div class="container mt-4">
-    <h2 class="fw-bold mb-1">Dashboard Workspace</h2>
-    <p class="text-muted small border-bottom pb-3">Logged in user tracking session: <strong>@SessionState.CurrentUserEmail</strong></p>
+<div class="container py-4" style="margin-top: 100px;">
 
-    <h4 class="fw-bold text-dark mt-4 mb-3">My Reported Cases</h4>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom pb-3" style="border-color: rgba(255,255,255,0.1) !important;">
+        <div>
+            <h2 class="fw-bold text-white mb-1" style="font-family: 'Playfair Display', serif;">Dashboard Workspace</h2>
+            <p class="text-white-50 small m-0">Logged in user tracking session: <strong class="text-info">@SessionState.CurrentUserEmail</strong></p>
+        </div>
+        <div>
+            <a href="report-case" class="btn btn-info text-dark fw-bold px-4 py-2.5 rounded-pill shadow-sm d-inline-flex align-items-center transition-transform">
+                <i class="bi bi-plus-circle-fill me-2 fs-5"></i> File New Case Report
+            </a>
+        </div>
+    </div>
+
+    <h4 class="fw-bold text-white mt-4 mb-3">My Reported Cases</h4>
     @if (myReportedCases == null)
     {
         <p class="text-muted small">Loading records...</p>
     }
     else if (!myReportedCases.Any())
     {
-        <p class="text-muted small bg-light p-3 rounded-3 border">You haven't reported any lost or found items yet.</p>
+        <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
+            You haven't reported any lost or found items yet.
+        </p>
     }
     else
     {
@@ -55,14 +67,16 @@
         </div>
     }
 
-    <h4 class="fw-bold text-dark mt-4 mb-3">My Claimed Items</h4>
+    <h4 class="fw-bold text-white mt-4 mb-3">My Claimed Items</h4>
     @if (myClaimedItems == null)
     {
         <p class="text-muted small">Loading records...</p>
     }
     else if (!myClaimedItems.Any())
     {
-        <p class="text-muted small bg-light p-3 rounded-3 border">You haven't claimed any reported items yet.</p>
+        <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
+            You haven't claimed any reported items yet.
+        </p>
     }
     else
     {
