@@ -2,21 +2,27 @@
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top px-4 py-3 custom-navbar-shadow">
+<nav class="navbar navbar-expand-lg navbar-light sticky-top px-4 py-3 custom-navbar-shadow">
     <div class="container-fluid">
 
-        <a class="navbar-brand fw-bold text-white tracking-wide" href="">
-            <span class="text-info">Air </span> University Lost And Found
+        <a class="navbar-brand d-flex align-items-center gap-3 fw-bold tracking-wide" href="">
+            <div class="logo-airplane-wrapper d-flex align-items-center justify-content-center" title="Air University Systems">
+                <i class="bi bi-airplane-engines fs-5 text-info rotate-logo"></i>
+            </div>
+
+            <span>
+                <span class="text-info">Air </span> University Lost And Found
+            </span>
         </a>
 
         <div class="d-flex align-items-center ms-auto gap-4">
 
-            <a class="nav-link-custom text-white-50 " href="#how-it-works">How Portal Works</a>
-            <a class="nav-link-custom text-white-50 small " href="browse-items">Browse Items </a>
+            <a class="nav-link-custom" href="#how-it-works">How Portal Works</a>
+            <a class="nav-link-custom small" href="browse-items">Browse Items</a>
 
             @if (SessionState.IsLoggedIn)
             {
-                <button class="btn btn-sm btn-outline-info rounded-pill px-3" @onclick="LogUserOut">
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" @onclick="LogUserOut">
                     SIGN OUT
                 </button>
             }
@@ -26,10 +32,6 @@
                     Sign In
                 </a>
             }
-
-            <div class="logo-airplane-wrapper ms-2 d-flex align-items-center justify-content-center" title="Air University Systems">
-                <i class="bi bi-airplane-engines fs-4 text-info rotate-logo"></i>
-            </div>
 
         </div>
     </div>
