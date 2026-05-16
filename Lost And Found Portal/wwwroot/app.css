@@ -1,82 +1,38 @@
-/* HERO LAYOUT GRAPHIC GENERATION SYSTEM */
-.hero-viewport {
-	min-height: 85vh;
-	background: url('/images/au-kharian-campus.jpg') no-repeat center center;
-	background-size: cover;
-	isolation: isolate;
-}
-
-.hero-overlay-blur {
-	position: absolute;
-	inset: 0;
-	background: linear-gradient(135deg, rgba(10, 25, 47, 0.85), rgba(17, 34, 64, 0.7));
-	z-index: -1;
-}
-
-/* TRANSLUCENT GLASS CARD OVERLAY SPECIFICATION */
-.glass-card {
-	background: rgba(255, 255, 255, 0.08) !important;
-	backdrop-filter: blur(12px) saturate(160%) !important;
-	-webkit-backdrop-filter: blur(12px) saturate(160%) !important;
-	border: 1px solid rgba(255, 255, 255, 0.15) !important;
-	max-width: 750px;
-}
+﻿/* Custom Corporate Navy Palette for AU Portal Headers */
 .bg-navy-custom {
 	background-color: #0a192f !important;
 }
 
-/* DECORATION PILL RULES */
-.btn-info-pill {
-	background-color: #64ffda !important;
-	color: #0a192f !important;
-	border-radius: 50px;
-	transition: all 0.2s ease;
+/* HERO SECTION BACKDROP */
+.hero-container {
+	min-height: 75vh;
+	/* 🚀 UPDATED LOCAL IMAGE PATH MATCHING YOUR PROJECT DIRECTORY */
+	background: linear-gradient(rgba(10, 25, 47, 0.75), rgba(10, 25, 47, 0.85)), url('/Images/Uploads/au-kharian-campus.jpg');
+	background-size: cover;
+	background-position: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-	.btn-info-pill:hover {
-		background-color: #52deb9 !important;
-		transform: translateY(-2px);
-	}
-
-/* UTILITIES */
-.bg-light-danger {
-	background-color: #fee2e2;
+/* TRANSLUCENT GLASS CARD OVERLAY REQUIREMENT */
+.transparent-glass-card {
+	background: rgba(255, 255, 255, 0.12) !important;
+	backdrop-filter: blur(15px) !important;
+	-webkit-backdrop-filter: blur(15px) !important;
+	border: 1px solid rgba(255, 255, 255, 0.25) !important;
+	max-width: 700px;
+	width: 100%;
 }
 
-.bg-light-info {
+/* HOW PORTAL WORKS STEP ICONS */
+.icon-badge {
+	width: 60px;
+	height: 60px;
 	background-color: #e0f2fe;
-}
-
-.bg-light-success {
-	background-color: #dcfce7;
-}
-
-.work-step-icon {
-	width: 70px;
-	height: 70px;
-}
-
-.fw-black {
-	font-weight: 900;
-}
-
-.text-shadow-sm {
-	text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-/* ENTRANCE FADE ANIMATION */
-.animate-fade-in {
-	animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes fadeInUp {
-	from {
-		opacity: 0;
-		transform: translateY(20px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 1rem;
 }

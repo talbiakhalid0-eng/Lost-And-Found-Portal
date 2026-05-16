@@ -2,15 +2,32 @@
 {
 	public class UserSessionState
 	{
-		// Ensure both properties have public getters and setters
+		// 🚀 Fully accessible setters to fix CS0200, CS0272, and CS1061 errors completely!
 		public bool IsLoggedIn { get; set; } = false;
-		public string CurrentUserEmail { get; set; } = string.Empty;
+		public string CurrentUserEmail { get; set; } = "";
 
-		// Optional helper method to cleanly reset everything on logout
-		public void ClearSession()
+		// Event backing to allow navbar refreshes
+		public event Action? OnStateChange;
+
+		public void Login(string email)
+		{
+			IsLoggedIn = true;
+			CurrentUserEmail = email;
+			NotifyStateChanged();
+		}
+
+		public void Logout()
 		{
 			IsLoggedIn = false;
-			CurrentUserEmail = string.Empty;
+			CurrentUserEmail = "";
+			NotifyStateChanged();
 		}
+
+		public void ClearSession()
+		{
+			Logout();
+		}
+
+		private void NotifyStateChanged() => OnStateChange?.Invoke();
 	}
 }
