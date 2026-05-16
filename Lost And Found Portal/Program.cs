@@ -15,6 +15,7 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<UserSessionState>();
 
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
