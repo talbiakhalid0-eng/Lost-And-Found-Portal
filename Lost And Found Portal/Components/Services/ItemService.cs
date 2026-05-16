@@ -8,8 +8,6 @@ namespace Lost_And_Found_Portal.Components.Services
 	{
 		private readonly ApplicationDbContext _context;
 
-		public ApplicationDbContext Context => _context;
-
 		public ItemService(ApplicationDbContext context)
 		{
 			_context = context;
@@ -20,10 +18,9 @@ namespace Lost_And_Found_Portal.Components.Services
 			return await _context.Items.ToListAsync();
 		}
 
-		// UPDATE THIS METHOD HERE TO FIX THE NULL COLUMN DATABASE ERRORS
 		public async Task AddItemAsync(Item item)
 		{
-			// If database doesn't allow NULLs, provide automatic fallback placeholders
+			// Now that properties exist in Item.cs, these guards will compile perfectly
 			if (string.IsNullOrWhiteSpace(item.Description))
 			{
 				item.Description = "No description provided.";
