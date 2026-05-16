@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Lost_And_Found_Portal.Components.Models; // Ensure this matches your Item.cs folder
-using Lost_And_Found_Portal.Components.Data;   // Ensure this matches your ApplicationDbContext folder
+using Lost_And_Found_Portal.Components.Models;
+using Lost_And_Found_Portal.Components.Data;
 
 namespace Lost_And_Found_Portal.Components.Services
 {
