@@ -1,6 +1,7 @@
 ﻿@page "/admin/moderation"
 @using Lost_And_Found_Portal.Components.Models
 @using Lost_And_Found_Portal.Components.Services
+@using Lost_And_Found_Portal.Services
 @inject IItemService ItemService
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
@@ -8,29 +9,29 @@
 
 <div class="container mt-4">
     <div class="border-bottom pb-3 mb-4">
-        <h2 class="fw-bold text-danger"><i class="bi bi-shield-lock-fill me-2"></i>Admin Moderation Panel</h2>
-        <p class="text-muted small mb-0">Live entry resolution and database management console</p>
+        <h2 class="fw-bold text-danger"><i class="bi bi-shield-check-fill me-2"></i>Security Moderation Desk</h2>
+        <p class="text-muted small mb-0">Evaluate verification logs, approve ownership claims, or purge entries.</p>
     </div>
 
     @if (masterItemsList == null)
     {
         <div class="text-center py-5">
             <div class="spinner-border text-danger" role="status"></div>
-            <p class="text-muted small mt-2">Streaming master active registry feed...</p>
+            <p class="text-muted small mt-2">Streaming real-time database rows...</p>
         </div>
     }
     else
     {
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card border-0 shadow rounded-4 overflow-hidden bg-white">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-dark small text-uppercase">
                         <tr>
-                            <th class="ps-3">Item Name</th>
-                            <th>Location</th>
-                            <th>Reporter Contact Email</th>
-                            <th>Claim Status</th>
-                            <th class="text-center">Action</th>
+                            <th class="ps-3">Item Details</th>
+                            <th>Status State</th>
+                            <th>Claimed By Account</th>
+                            <th>Submitted Ownership Proof</th>
+                            <th class="text-center">Moderator Actions</th>
                         </tr>
                     </thead>
                     <tbody class="small">
@@ -39,19 +40,43 @@
                             <tr>
                                 <td class="ps-3">
                                     <div class="fw-bold text-dark">@item.Title</div>
-                                    <span class="badge bg-light text-secondary border small text-uppercase" style="font-size: 10px;">@item.Category</span>
+                                    <div class="text-muted xsmall"><i class="bi bi-geo-alt"></i> @item.Location | @item.Category</div>
                                 </td>
-                                <td><i class="bi bi-geo-alt-fill text-info me-1"></i>@item.Location</td>
-                                <td><span class="font-monospace text-navy">@item.UserEmail</span></td>
                                 <td>
-                                    <span class="badge px-2 py-1 rounded-pill @(item.ClaimStatus == "Claimed" ? "bg-warning text-dark fw-bold" : "bg-light text-muted border")">
+                                    <span class="badge px-2 py-1 rounded-pill @(item.ClaimStatus == "Claimed" ? "bg-success text-white" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark fw-bold" : "bg-light text-muted border")">
                                         @item.ClaimStatus
                                     </span>
                                 </td>
+                                <td>
+                                    <span class="font-monospace text-navy fw-semibold">@(item.ClaimedByEmail ?? "None / Available")</span>
+                                </td>
+                                <td style="max-width: 260px;" class="text-wrap">
+                                    @if (!string.IsNullOrEmpty(item.ClaimProofOfOwnership))
+                                    {
+                                        <div class="p-2 rounded bg-light border font-monospace text-dark xsmall">
+                                            "@item.ClaimProofOfOwnership"
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted italic small">No claim filed yet</span>
+                                    }
+                                </td>
                                 <td class="text-center pe-3">
-                                    <button class="btn btn-sm btn-danger rounded-pill px-3 shadow-sm fw-bold" @onclick="() => ProcessForcedPurge(item.Id)">
-                                        <i class="bi bi-shield-x me-1"></i>Force Purge
-                                    </button>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        @if (item.ClaimStatus == "PendingApproval")
+                                        {
+                                            <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" @onclick="() => HandleClaimResolution(item, true)">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Approve
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" @onclick="() => HandleClaimResolution(item, false)">
+                                                <i class="bi bi-x-circle-fill me-1"></i> Reject
+                                            </button>
+                                        }
+                                        <button class="btn btn-sm btn-danger rounded-pill px-2 shadow-sm" title="Delete record permanently" @onclick="() => PurgeRecord(item.Id)">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -67,21 +92,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // HARD LOCKDOWN: Prevent background data exposure by bouncing unauthorized routing attempts
+        // Strict security route guard check
         if (!IsUserAdmin())
         {
             Nav.NavigateTo("/dashboard");
             return;
         }
-
         await RefreshGrid();
     }
 
     private bool IsUserAdmin()
     {
         if (string.IsNullOrEmpty(SessionState.CurrentUserEmail)) return false;
-        return SessionState.CurrentUserEmail.Contains("admin") ||
-               SessionState.CurrentUserEmail.StartsWith("247240"); // Explicit authorization elevation rule
+        return SessionState.CurrentUserEmail.Contains("admin") || SessionState.CurrentUserEmail.StartsWith("247240");
     }
 
     private async Task RefreshGrid()
@@ -90,7 +113,25 @@
         masterItemsList = items.OrderByDescending(i => i.Id).ToList();
     }
 
-    private async Task ProcessForcedPurge(int itemId)
+    private async Task HandleClaimResolution(Item item, bool isApproved)
+    {
+        if (isApproved)
+        {
+            item.ClaimStatus = "Claimed";
+        }
+        else
+        {
+            // If rejected, clear tracking fields and reset status back to Available
+            item.ClaimStatus = "Available";
+            item.ClaimedByEmail = null;
+            item.ClaimProofOfOwnership = null;
+        }
+
+        await ItemService.UpdateItemAsync(item);
+        await RefreshGrid();
+    }
+
+    private async Task PurgeRecord(int itemId)
     {
         await ItemService.DeleteItemAsync(itemId);
         await RefreshGrid();

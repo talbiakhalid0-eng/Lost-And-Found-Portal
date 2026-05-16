@@ -7,132 +7,123 @@
 @inject NavigationManager Nav
 @rendermode RenderMode.InteractiveServer
 
-<div>
-    <h3>Dashboard Workspace</h3>
-    <p>Logged in user tracking session: <strong>@SessionState.CurrentUserEmail</strong></p>
+<div class="container mt-4">
+    <h2 class="fw-bold mb-1">Dashboard Workspace</h2>
+    <p class="text-muted small border-bottom pb-3">Logged in user tracking session: <strong>@SessionState.CurrentUserEmail</strong></p>
 
-    <hr />
-
-    <h4>My Reported Cases</h4>
-    @if (myReports == null)
+    <h4 class="fw-bold text-dark mt-4 mb-3">My Reported Cases</h4>
+    @if (myReportedCases == null)
     {
-        <p>Loading personal case registers...</p>
+        <p class="text-muted small">Loading records...</p>
     }
-    else if (!myReports.Any())
+    else if (!myReportedCases.Any())
     {
-        <p>You have not logged any item reports yet.</p>
+        <p class="text-muted small bg-light p-3 rounded-3 border">You haven't reported any lost or found items yet.</p>
     }
     else
     {
-        <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; margin-bottom: 30px;">
-            <thead>
-                <tr style="background-color: #f2f2f2;">
-                    <th>Item Title</th>
-                    <th>Location</th>
-                    <th>Type</th>
-                    <th>Claim Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in myReports)
-                {
+        <div class="table-responsive mb-5 shadow-sm rounded-3">
+            <table class="table table-bordered align-middle bg-white mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td><strong>@item.Title</strong></td>
-                        <td>@item.Location</td>
-                        <td>@(item.IsLost ? "Lost" : "Found")</td>
-                        <td>
-                            @if (item.ClaimStatus == "Claimed")
-                            {
-                                <span>Claimed by <em>@item.ClaimedByEmail</em></span>
-                            }
-                            else
-                            {
-                                <span>Available / Unclaimed</span>
-                            }
-                        </td>
-                        <td>
-                            <button @onclick="() => RemoveReportedItem(item.Id)" style="color: red; font-weight: bold; cursor: pointer;">
-                                Remove Case
-                            </button>
-                        </td>
+                        <th>Item Title</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Claim Status</th>
+                        <th>Action</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in myReportedCases)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.Title</td>
+                            <td>@item.Location</td>
+                            <td><span class="badge @(item.IsLost ? "bg-danger" : "bg-success")">@(item.IsLost ? "Lost" : "Found")</span></td>
+                            <td>
+                                <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark" : "bg-secondary")">
+                                    @item.ClaimStatus
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveCase(item.Id)">Remove Case</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 
-    <h4>My Claimed Items</h4>
-    @if (myClaims == null)
+    <h4 class="fw-bold text-dark mt-4 mb-3">My Claimed Items</h4>
+    @if (myClaimedItems == null)
     {
-        <p>Loading claim parameters...</p>
+        <p class="text-muted small">Loading records...</p>
     }
-    else if (!myClaims.Any())
+    else if (!myClaimedItems.Any())
     {
-        <p>You haven't claimed any reported items yet.</p>
+        <p class="text-muted small bg-light p-3 rounded-3 border">You haven't claimed any reported items yet.</p>
     }
     else
     {
-        <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
-            <thead>
-                <tr style="background-color: #f2f2f2;">
-                    <th>Item Title</th>
-                    <th>Found Location</th>
-                    <th>Original Reporter</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in myClaims)
-                {
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-bordered align-middle bg-white mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>@item.Title</td>
-                        <td>@item.Location</td>
-                        <td>@item.UserEmail</td>
-                        <td><span style="color: green; font-weight: bold;">@item.ClaimStatus</span></td>
+                        <th>Item Title</th>
+                        <th>Found Location</th>
+                        <th>Verification Status</th>
+                        <th>Your Submitted Proof</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in myClaimedItems)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">@item.Title</td>
+                            <td>@item.Location</td>
+                            <td>
+                                <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : "bg-warning text-dark fw-bold")">
+                                    @(item.ClaimStatus == "Claimed" ? "Approved & Verified" : "Awaiting Admin Approval")
+                                </span>
+                            </td>
+                            <td class="font-monospace text-muted xsmall">"@item.ClaimProofOfOwnership"</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 </div>
 
 @code {
-    private List<Item>? myReports;
-    private List<Item>? myClaims;
+    private List<Item>? myReportedCases;
+    private List<Item>? myClaimedItems;
 
     protected override async Task OnInitializedAsync()
     {
-        // Enforce basic auth gate routing
         if (!SessionState.IsLoggedIn)
         {
-            Nav.NavigateTo("/login");
+            Nav.NavigateTo("login");
             return;
         }
-
         await LoadDashboardData();
     }
 
     private async Task LoadDashboardData()
     {
-        var allItems = await ItemService.GetAllItemsAsync();
+        var items = await ItemService.GetAllItemsAsync();
 
-        if (allItems != null)
-        {
-            // Filter out items matching this user's logged email session
-            myReports = allItems.Where(i => i.UserEmail == SessionState.CurrentUserEmail).ToList();
+        // 1. Filter items that THIS user reported
+        myReportedCases = items.Where(i => i.UserEmail.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
 
-            // Filter out items belonging to others that this user claimed
-            myClaims = allItems.Where(i => i.ClaimedByEmail == SessionState.CurrentUserEmail).ToList();
-        }
+        // 2. Filter items that THIS user is currently claiming
+        myClaimedItems = items.Where(i => i.ClaimedByEmail?.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
     }
 
-    private async Task RemoveReportedItem(int itemId)
+    private async Task RemoveCase(int id)
     {
-        // Call the data access layer service to run database removal
-        await ItemService.DeleteItemAsync(itemId);
-
-        // Re-query the system back-to-back to drop item from view instantly
+        await ItemService.DeleteItemAsync(id);
         await LoadDashboardData();
     }
 }

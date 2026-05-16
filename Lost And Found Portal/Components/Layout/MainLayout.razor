@@ -1,15 +1,61 @@
 ﻿@inherits LayoutComponentBase
+@using Lost_And_Found_Portal.Services
+@inject UserSessionState SessionState
+@inject NavigationManager Nav
 
-<div class="min-vh-100 d-flex flex-column bg-light">
-    <NavMenu />
+<div class="page-wrapper">
+    <header class="app-header shadow-sm">
+        <div class="container d-flex justify-content-between align-items-center py-3">
+            <div class="brand-title fw-bold" @onclick='() => Nav.NavigateTo("/dashboard")'>
+                <i class="bi bi-shield-lock-fill me-2"></i>AU Security Portal
+            </div>
 
-    <main class="flex-grow-1 py-5">
-        <div class="container">
-            @Body
+            <nav class="d-flex align-items-center gap-3">
+                @if (SessionState.IsLoggedIn)
+                {
+                    <span class="text-light small font-monospace d-none d-md-inline">
+                        <i class="bi bi-person-circle me-1"></i>@SessionState.CurrentUserEmail
+                    </span>
+                    <a href="/dashboard" class="nav-link-custom">Dashboard</a>
+                    <a href="/browse-items" class="nav-link-custom">Browse</a>
+
+                    @if (IsUserAdmin())
+                    {
+                        <a href="/admin/analytics" class="nav-link-custom admin-link">Analytics</a>
+                        <a href="/admin/moderation" class="nav-link-custom admin-link">Moderation</a>
+                    }
+
+                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3 ms-2" @onclick="ProcessSignOut">
+                        <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+                    </button>
+                }
+            </nav>
         </div>
+    </header>
+
+    <main class="main-content container py-4">
+        @Body
     </main>
 
-    <footer class="bg-dark text-white-50 text-center py-3 mt-auto small">
-        &copy; 2026 AU Kharian Security Portal v1.0 | Safeguarding Campus Belongings
+    <footer class="app-footer border-top py-3 text-center mt-auto">
+        <div class="container small text-muted">
+            &copy; 2026 AU Kharian Security Portal v1.0 | Safeguarding Campus Belongings
+        </div>
     </footer>
 </div>
+
+@code {
+    private bool IsUserAdmin()
+    {
+        if (string.IsNullOrEmpty(SessionState.CurrentUserEmail)) return false;
+        return SessionState.CurrentUserEmail.Contains("admin") ||
+               SessionState.CurrentUserEmail.StartsWith("247240");
+    }
+
+    private void ProcessSignOut()
+    {
+        SessionState.IsLoggedIn = false;
+        SessionState.CurrentUserEmail = string.Empty;
+        Nav.NavigateTo("login");
+    }
+}
