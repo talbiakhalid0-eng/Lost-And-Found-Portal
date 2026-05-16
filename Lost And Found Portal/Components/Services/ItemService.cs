@@ -1,6 +1,6 @@
-﻿using Lost_And_Found_Portal.Components.Data;
-using Lost_And_Found_Portal.Components.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Lost_And_Found_Portal.Components.Models; // Ensure this matches your Item.cs folder
+using Lost_And_Found_Portal.Components.Data;   // Ensure this matches your ApplicationDbContext folder
 
 namespace Lost_And_Found_Portal.Components.Services
 {
@@ -13,18 +13,18 @@ namespace Lost_And_Found_Portal.Components.Services
 			_context = context;
 		}
 
-		public async Task<IEnumerable<Item>> GetAllItemsAsync()
+		public async Task<IEnumerable<Lost_And_Found_Portal.Components.Models.Item>> GetAllItemsAsync()
 		{
 			return await _context.Items.ToListAsync();
 		}
 
-		public async Task AddItemAsync(Item item)
+		public async Task AddItemAsync(Lost_And_Found_Portal.Components.Models.Item item)
 		{
 			_context.Items.Add(item);
 			await _context.SaveChangesAsync();
 		}
 
-		public async Task UpdateItemAsync(Item item)
+		public async Task UpdateItemAsync(Lost_And_Found_Portal.Components.Models.Item item)
 		{
 			_context.Items.Update(item);
 			await _context.SaveChangesAsync();

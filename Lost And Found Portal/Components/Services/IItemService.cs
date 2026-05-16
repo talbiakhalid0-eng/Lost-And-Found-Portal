@@ -1,12 +1,10 @@
-﻿using Lost_And_Found_Portal.Components.Models;
-
-namespace Lost_And_Found_Portal.Components.Services
+﻿namespace Lost_And_Found_Portal.Components.Services
 {
 	public interface IItemService
 	{
-		Task<IEnumerable<Item>> GetAllItemsAsync();
-		Task AddItemAsync(Item item);
-		Task UpdateItemAsync(Item item);
+		Task<IEnumerable<Lost_And_Found_Portal.Components.Models.Item>> GetAllItemsAsync();
+		Task AddItemAsync(Lost_And_Found_Portal.Components.Models.Item item);
+		Task UpdateItemAsync(Lost_And_Found_Portal.Components.Models.Item item);
 		Task DeleteItemAsync(int id);
 	}
 }
