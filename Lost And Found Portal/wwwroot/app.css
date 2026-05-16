@@ -43,8 +43,8 @@ h1, h2, h3, .display-4, .display-3 {
 	top: 0 !important;
 	left: 0 !important;
 	background-color: rgba(255, 255, 255, 0.96) !important; /* Premium ultra-sheer white foundation */
-	backdrop-filter: blur(12px) !important;
-	-webkit-backdrop-filter: blur(12px) !important;
+	backdrop-filter: blur(1px) !important;
+	-webkit-backdrop-filter: blur(1px) !important;
 	box-shadow: 0 4px 20px rgba(10, 25, 47, 0.08) !important; /* Subtle soft shadow profile */
 	border-bottom: 1px solid rgba(10, 25, 47, 0.06) !important;
 	padding: 1rem 2rem !important;
