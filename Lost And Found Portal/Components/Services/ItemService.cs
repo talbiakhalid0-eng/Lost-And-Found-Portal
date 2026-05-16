@@ -6,8 +6,10 @@ namespace Lost_And_Found_Portal.Components.Services
 {
 	public class ItemService : IItemService
 	{
+		// CRITICAL FIX: This field must be declared so the constructor can use it!
 		private readonly LostAndFoundPortalContext _context;
 
+		// The constructor receives the database context from Program.cs and stores it
 		public ItemService(LostAndFoundPortalContext context)
 		{
 			_context = context;
