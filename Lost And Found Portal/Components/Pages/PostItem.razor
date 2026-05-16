@@ -1,12 +1,13 @@
 ﻿@page "/report-case"
 @using Lost_And_Found_Portal.Components.Models
 @using Lost_And_Found_Portal.Components.Services
+@using Lost_And_Found_Portal.Services
 @inject IItemService ItemService
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
 @rendermode RenderMode.InteractiveServer
 
-<div class="container mt-4" style="max-width: 600px;">
+<div class="container py-4" style="margin-top: 100px; max-width: 600px;">
     <div class="card shadow border-0 rounded-4 p-4 bg-white">
         <h3 class="fw-bold text-navy mb-3"><i class="bi bi-pencil-square me-2"></i>Report an Item Case</h3>
 
@@ -33,7 +34,8 @@
                 </div>
             }
 
-            <form @submit:preventDefault="ProcessSubmission">
+            <EditForm Model="this" OnValidSubmit="ProcessSubmission" FormName="AirUniversityReportForm">
+
                 <div class="mb-3">
                     <label class="form-label fw-bold mb-1">Item Title / Name <span class="text-danger">*</span></label>
                     <input type="text" @bind="itemTitle" class="form-control rounded-3 @(validationErrors.ContainsKey("Title") ? "is-invalid" : "")" placeholder="e.g., Keys, Wallet" />
@@ -90,7 +92,7 @@
                     </select>
                 </div>
 
-                <button type="submit" disabled="@isProcessing" class="btn btn-navy w-100 rounded-pill py-2 fw-bold shadow-sm">
+                <button type="submit" disabled="@isProcessing" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">
                     @if (isProcessing)
                     {
                         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -101,7 +103,7 @@
                         <span><i class="bi bi-cloud-arrow-up-fill me-1"></i> Submit Report</span>
                     }
                 </button>
-            </form>
+            </EditForm>
         }
     </div>
 </div>
@@ -119,7 +121,6 @@
     private string? debugErrorMessage;
     private bool isProcessing = false;
 
-    // Dictionary to track field-specific errors
     private Dictionary<string, string> validationErrors = new();
 
     protected override void OnInitialized()
@@ -134,12 +135,10 @@
     {
         if (isProcessing) return;
 
-        // Clear out old states
         validationErrors.Clear();
         successMessage = null;
         debugErrorMessage = null;
 
-        // 1. FRONTEND USER EXPERIENCE VALIDATION CHECKS
         if (string.IsNullOrWhiteSpace(itemTitle))
             validationErrors.Add("Title", "Item Title/Name is strictly required.");
         else if (itemTitle.Length > 200)
@@ -155,7 +154,6 @@
         else if (itemContactInfo.Length > 150)
             validationErrors.Add("ContactInfo", "Contact phone or text info cannot exceed 150 characters.");
 
-        // If validation rules fail, stop execution before calling service layer
         if (validationErrors.Any())
         {
             StateHasChanged();
