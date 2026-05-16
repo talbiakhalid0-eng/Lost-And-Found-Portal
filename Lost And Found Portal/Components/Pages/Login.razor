@@ -13,8 +13,7 @@
             <p class="text-muted">Enter your official university credentials</p>
         </div>
 
-        <EditForm Model="registerModel" OnValidSubmit="HandleLogin" FormName="loginForm">
-            <DataAnnotationsValidator />
+        <EditForm Model="registerModel" OnValidSubmit="HandleLogin" FormName="loginForm" @onsubmit:preventDefault>
 
             <div class="mb-3">
                 <label class="form-label fw-bold">AU Email Address</label>
@@ -68,23 +67,20 @@
     }
 
     private async Task HandleLogin()
+{
+        Console.WriteLine("--- HandleLogin Started ---");
+    var success = await AuthService.LoginUserAsync(registerModel.Email, registerModel.Password);
+
+    if (success)
     {
-        // Check for null manually to satisfy warning CS8602
-        if (registerModel == null || string.IsNullOrEmpty(registerModel.Email))
-        {
-            return;
-        }
-
-        var success = await AuthService.LoginUserAsync(registerModel.Email, registerModel.Password);
-
-        if (success)
-        {
-            // Force a full redirect to bypass the POST state
-            Nav.NavigateTo("/dashboard", forceLoad: true);
-        }
-        else
-        {
-            errorMessage = "Invalid AU email or password.";
-        }
+        errorMessage = "Match found! Redirecting..."; // Add this line
+        StateHasChanged();
+        Nav.NavigateTo("/dashboard", forceLoad: true);
+    }
+    else
+    {
+        errorMessage = "Database said NO. Check your SQL data again.";
+    }
+}
     }
 }
