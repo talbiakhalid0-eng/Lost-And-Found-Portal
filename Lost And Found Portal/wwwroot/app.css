@@ -1,101 +1,37 @@
-/* Hero Section Setup */
-.hero-wrap {
-	/* Increase this value to make the background taller */
-	/* 100vh means it will take up the full height of the browser window */
-	height: 100vh;
-	background-image: url('../Images/Uploads/au-kharian-campus.jpg');
-	background-size:cover;
-	background-position: center;
-	background-attachment: fixed;
-	display: flex;
-	align-items: center; /* Keeps the box vertically centered */
-	justify-content: center;
-	position: relative;
-	margin-top: -50px; /* Adjust this based on your navbar height */
-}
-
-.hero-content {
-	/* Change 'height' to 'auto' or 'min-height' so it doesn't grow with the background */
-	height: auto !important;
-	width: 80%;
-	max-width: 850px;
-	background: rgba(0, 0, 0, 0.4);
-	backdrop-filter: blur(1px);
-	border-radius: 25px;
-	padding: 4rem; /* Controls the size of the box around the text */
-	border: 1px solid rgba(255, 255, 255, 0.1);
-}
-	.hero-content h1, .hero-content p {
-		text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
-	}
-
-/* Make the brand text stand out */
-.brand-text span {
-	letter-spacing: 1px;
-	text-transform: uppercase;
-}
-
-/* Fix nav-link hover states so they don't just stay white */
-.nav-link {
-	transition: color 0.3s ease;
-}
-
-	.nav-link:hover {
-		color: #0dcaf0 !important; /* AU Light Blue */
-	}
-
-/* If you want to try making the logo transparent via CSS: */
-.logo-filter {
-	/* This tries to remove white backgrounds - use only if not using the 'white box' method */
-	mix-blend-mode: multiply;
-	filter: contrast(120%);
-}
-/* Sticky Nav Customization */
-.sticky-top {
-	backdrop-filter: blur(8px);
-}
-
-.nav-link {
-	font-weight: 500;
-	transition: all 0.2s ease;
-}
-
-	.nav-link:hover {
-		color: #0dcaf0 !important;
-	}
-
-/* Feature Cards Animation */
-.p-4.bg-light:hover {
-	transform: translateY(-10px);
-	transition: 0.3s;
-	background-color: #f0f8ff !important;
-}
-
-html {
-	scroll-behavior: smooth;
-}
-
-.auth-wrapper {
-	height: 90vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: #f8f9fa; /* Clean light background */
-}
-
-.auth-card {
-	background: white;
-	width: 100%;
-	max-width: 450px;
-	border: 1px solid rgba(0,0,0,0.05);
+/* Custom color palette overrides for AU Kharian theme layout */
+.bg-navy-custom {
+	background-color: #004071 !important;
 }
 
 .text-navy {
-	color: #003366;
+	color: #004071 !important;
 }
 
-/* Custom focus ring for university branding */
-.auth-card .form-control:focus {
-	border-color: #0dcaf0;
-	box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
+.btn-info-pill {
+	background-color: #00d2ff !important;
+	border: none;
+	border-radius: 50px !important;
+	color: #03213b !important;
+	font-weight: bold;
 }
+
+.nav-link-custom {
+	color: #ffffff !important;
+	text-decoration: none !important;
+	font-size: 0.9rem;
+	padding: 8px 12px;
+}
+
+	.nav-link-custom:hover {
+		color: #00d2ff !important;
+	}
+
+/* Fix grid formatting behavior on data lists */
+.hover-lift {
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+	.hover-lift:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+	}

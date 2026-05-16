@@ -1,28 +1,15 @@
 ﻿@inherits LayoutComponentBase
-@using Lost_And_Found_Portal.Services
-@inject UserSessionState SessionState
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div class="min-vh-100 d-flex flex-column bg-light">
+    <NavMenu />
 
-    <main>
-        <div class="top-row px-4">
-            @if (SessionState.IsLoggedIn)
-            {
-                <span class="me-3 text-secondary">Logged in as: <strong>@SessionState.CurrentUserEmail</strong></span>
-                <button class="btn btn-sm btn-outline-danger rounded-pill" @onclick="SessionState.Logout">Sign Out</button>
-            }
-            else
-            {
-                <a href="login" class="btn btn-sm btn-info rounded-pill px-3">Sign In</a>
-            }
-        </div>
-
-        <article class="content px-4">
-            @* CRITICAL FIX: This tells Blazor exactly where to inject your pages! *@
+    <main class="flex-grow-1 py-5">
+        <div class="container">
             @Body
-        </article>
+        </div>
     </main>
+
+    <footer class="bg-dark text-white-50 text-center py-3 mt-auto small">
+        &copy; 2026 AU Kharian Security Portal v1.0 | Safeguarding Campus Belongings
+    </footer>
 </div>

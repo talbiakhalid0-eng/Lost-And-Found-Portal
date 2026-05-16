@@ -77,14 +77,13 @@
             IsLost = bool.Parse(isLostSelection),
             ImageUrl = string.IsNullOrEmpty(imageUrlInput) ? "images/placeholder.png" : imageUrlInput,
             UserEmail = SessionState.CurrentUserEmail,
-            IsApproved = true, // Auto-approve for development workflow testing
+            IsApproved = true, // Auto-approve for local staging test
             ClaimStatus = "Available"
         };
 
         await ItemService.AddItemAsync(newItem);
         successMessage = "Case reported successfully!";
 
-        // Brief pause to display success banner before navigating away
         await Task.Delay(1500);
         Nav.NavigateTo("/dashboard");
     }

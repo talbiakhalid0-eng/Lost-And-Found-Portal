@@ -1,1 +1,64 @@
-﻿
+﻿@using Lost_And_Found_Portal.Services
+@inject UserSessionState SessionState
+@inject NavigationManager Nav
+
+<header class="navbar navbar-dark bg-navy-custom px-4 shadow-sm">
+    <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between">
+
+        <a class="navbar-brand d-flex align-items-center fw-bold text-white fs-4" href="" style="letter-spacing: 1px;">
+            <i class="bi bi-airplane-fill text-info me-2 rotate-45"></i>
+            AU KHARIAN <span class="text-info ms-1 fw-light">PORTAL</span>
+        </a>
+
+        <div class="d-flex align-items-center justify-content-center flex-grow-1 my-2 my-md-0 gap-4">
+            <a href="" class="nav-link-custom text-white fw-semibold small">How It Works?</a>
+            <a href="report-case" class="nav-link-custom text-white fw-semibold small">Report Case</a>
+            <a href="browse-items" class="nav-link-custom text-white fw-semibold small">Browse Items</a>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            @if (SessionState.IsLoggedIn)
+            {
+                <span class="text-white-50 small d-none d-md-inline">
+                    Active: <strong class="text-info">@SessionState.CurrentUserEmail</strong>
+                </span>
+                <button class="btn btn-info-pill fw-bold text-dark px-4 py-2 btn-sm shadow-sm" @onclick="LogUserOut">
+                    Sign Out
+                </button>
+            }
+            else
+            {
+                <a href="login" class="btn btn-info-pill fw-bold text-dark px-4 py-2 shadow-sm">
+                    Sign In
+                </a>
+            }
+        </div>
+
+    </div>
+</header>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Subscribe layout components safely to updates
+        SessionState.OnStateChange += HandleStateChange;
+    }
+
+    // CRITICAL FIX: Forces the UI update to occur safely on the main thread dispatcher
+    private async void HandleStateChange()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void LogUserOut()
+    {
+        SessionState.Logout();
+        Nav.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        // Always un-subscribe to prevent thread memory leaks
+        SessionState.OnStateChange -= HandleStateChange;
+    }
+}
