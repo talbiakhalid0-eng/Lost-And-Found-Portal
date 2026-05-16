@@ -6,25 +6,25 @@ namespace Lost_And_Found_Portal.Components.Services
 {
 	public class ItemService : IItemService
 	{
-		private readonly ApplicationDbContext _context;
+		private readonly LostAndFoundPortalContext _context;
 
-		public ItemService(ApplicationDbContext context)
+		public ItemService(LostAndFoundPortalContext context)
 		{
 			_context = context;
 		}
 
-		public async Task<IEnumerable<Lost_And_Found_Portal.Components.Models.Item>> GetAllItemsAsync()
+		public async Task<IEnumerable<Item>> GetAllItemsAsync()
 		{
 			return await _context.Items.ToListAsync();
 		}
 
-		public async Task AddItemAsync(Lost_And_Found_Portal.Components.Models.Item item)
+		public async Task AddItemAsync(Item item)
 		{
 			_context.Items.Add(item);
 			await _context.SaveChangesAsync();
 		}
 
-		public async Task UpdateItemAsync(Lost_And_Found_Portal.Components.Models.Item item)
+		public async Task UpdateItemAsync(Item item)
 		{
 			_context.Items.Update(item);
 			await _context.SaveChangesAsync();
