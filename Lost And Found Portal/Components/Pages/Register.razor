@@ -30,7 +30,7 @@
             </div>
         }
 
-        <form @submit:preventDefault="HandleRegistration">
+        <form @onsubmit="HandleRegistration" @onsubmit:preventDefault>
 
             <div class="mb-3">
                 <label class="form-label fw-bold small mb-1">Official University Email <span class="text-danger">*</span></label>
@@ -78,6 +78,7 @@
 
     </div>
 </div>
+
 <style>
     .bg-navy-custom {
         background-color: #0a192f !important;
@@ -130,7 +131,6 @@
         }
 
         // --- EXPLICIT AU CAMPUS EMAIL DOMAIN VALIDATOR ---
-        // 🎯 FIX: Changed '@@' to single '@' since we are inside a native C# code block context
         var cleanEmail = email.Trim().ToLower();
         if (!cleanEmail.EndsWith("@students.au.edu.pk") && !cleanEmail.EndsWith("@au.edu.pk"))
         {
@@ -144,7 +144,7 @@
             return;
         }
 
-        if (password.Length < 4) // Matches typical school test lengths cleanly
+        if (password.Length < 4)
         {
             errorMessage = "Password security issue: Must be at least 4 characters long.";
             return;
@@ -161,7 +161,6 @@
                 Password = password
             };
 
-            // Call to your concrete entity context tracking pipeline
             bool registrationSuccess = await UserService.RegisterUserAsync(newCampusUser);
 
             if (registrationSuccess)
