@@ -10,8 +10,8 @@
         <h2 class="fw-bold text-center text-navy mb-4">Create AU Account</h2>
 
         @* Added FormName here *@
-        <EditForm Model="regModel" OnValidSubmit="HandleRegister" FormName="registerForm">
-            <DataAnnotationsValidator />
+        <EditForm Model="regModel" OnValidSubmit="HandleRegister" FormName="registrationForm">
+       
 
             <div class="mb-3">
                 <label class="form-label fw-bold">Official AU Email</label>
@@ -50,9 +50,13 @@
 @code {
     // Added SupplyParameterFromForm attribute
     [SupplyParameterFromForm]
-    public RegisterModel regModel { get; set; } = default!;
+    public RegisterModel regModel { get; set; } = new();
 
     private string? errorMessage;
+    protected override void OnInitialized()
+    {
+        regModel ??= new RegisterModel();
+    }
 
     private async Task HandleRegister()
     {

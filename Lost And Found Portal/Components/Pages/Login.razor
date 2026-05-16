@@ -78,7 +78,7 @@
         errorMessage = "Match found! Redirecting..."; // Add this line
         StateHasChanged();
         Nav.NavigateTo("/dashboard", forceLoad: true);
-        SessionState.Login(registerModel.Email);
+            SessionState.Login(registerModel.Email);
             Nav.NavigateTo("/dashboard");
     }
     else

@@ -4,42 +4,104 @@
 @using Lost_And_Found_Portal.Components.Data
 @inject IItemService ItemService
 @inject NavigationManager Nav
+@inject UserSessionState SessionState
 @rendermode InteractiveServer
 
 <div class="container mt-5 pt-5">
     <div class="card shadow-lg border-0 rounded-4 p-4">
-        <h2 class="fw-bold text-navy">Submit a Report</h2>
-        <EditForm Model="newItem" OnValidSubmit="HandleSubmit">
+        <h2 class="fw-bold text-navy mb-4">Submit a Report</h2>
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success rounded-3 shadow-sm mb-3">
+                <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+            </div>
+        }
+
+        <EditForm Model="newItem" OnValidSubmit="HandleSubmit" FormName="postItemForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger small mb-3" />
+
             <div class="mb-3">
-                <label>Item Name</label>
-                <InputText @bind-Value="newItem.Title" class="form-control" />
+                <label class="form-label fw-semibold">Item Name</label>
+                <InputText @bind-Value="newItem.Title" class="form-control rounded-3" placeholder="e.g., Wallet, Student ID Card, Keys" />
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label>Type</label>
-                    <InputSelect @bind-Value="newItem.IsLost" class="form-select">
+                    <label class="form-label fw-semibold">Type</label>
+                    <InputSelect @bind-Value="newItem.IsLost" class="form-select rounded-3">
                         <option value="true">I Lost Something</option>
                         <option value="false">I Found Something</option>
                     </InputSelect>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label>Location (at AU Kharian)</label>
-                    <InputText @bind-Value="newItem.Location" class="form-control" placeholder="e.g. Admin Block" />
+                    <label class="form-label fw-semibold">Location (at AU Kharian)</label>
+                    <InputText @bind-Value="newItem.Location" class="form-control rounded-3" placeholder="e.g., Admin Block, Cafeteria, Lab 2" />
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold">Post Report</button>
+            @* Image Upload Section *@
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Upload Item Image <span class="text-muted small">(Optional)</span></label>
+                <div class="border border-dashed rounded-3 p-3 text-center bg-light">
+                    <InputFile OnChange="HandleFileSelected" class="form-control form-control-sm" />
+                    <p class="small text-muted mt-2 mb-0">Supported files: .png, .jpg, .jpeg</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-2 shadow-sm text-dark fs-5">
+                Post Report
+            </button>
         </EditForm>
     </div>
 </div>
 
 @code {
-    private Item newItem = new();
+    [SupplyParameterFromForm]
+    private Item newItem { get; set; } = new();
+
+    private string? successMessage;
+    private IBrowserFile? selectedFile;
+
+    protected override void OnInitialized()
+    {
+        // Security Gate: Bounce unauthenticated guests instantly back to login
+        if (!SessionState.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        // Safeguard initialization
+        newItem ??= new Item { IsLost = true };
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
 
     private async Task HandleSubmit()
     {
-        await ItemService.CreateItemAsync(newItem);
-        Nav.NavigateTo("/dashboard");
+        try
+        {
+            // Optional: Image processing logic can go here later if storing files on server disk
+            // For now, we save the form details straight to your database service
+            await ItemService.AddItemAsync(newItem);
+
+            successMessage = "Your report has been successfully registered on the AU Portal!";
+
+            // Reset form for next submission
+            newItem = new Item { IsLost = true };
+
+            // Optional: Redirect them to browse dashboard after 2 seconds to see their new item
+            // await Task.Delay(2000);
+            // Nav.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding item: {ex.Message}");
+        }
     }
 }
