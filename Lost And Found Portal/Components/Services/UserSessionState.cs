@@ -15,6 +15,7 @@
 			CurrentUserEmail = email;
 			NotifyStateChanged();
 		}
+		public event Action? OnChange;
 
 		public void Logout()
 		{
