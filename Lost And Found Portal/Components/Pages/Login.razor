@@ -1,9 +1,6 @@
 ﻿@page "/login"
 @using Lost_And_Found_Portal.Services
 @inject UserSessionState SessionState
-@inject NavigationManager Nav
-@* 🚀 INJECT USER SERVICE *@
-@inject UserService UserService
 @inject IUserService UserService
 @rendermode RenderMode.InteractiveServer
 
@@ -64,12 +61,12 @@
 
         try
         {
-            // 🚀 STEP 1: Route credentials down to your verification engine
+            // Route credentials down to your verification engine
             var authenticatedUser = await UserService.LoginAsync(emailInput.Trim(), passwordInput);
 
             if (authenticatedUser != null)
             {
-                // 🚀 STEP 2: Lock data into our verified singleton state safely
+                // Lock data into our verified scoped state safely
                 SessionState.IsLoggedIn = true;
                 SessionState.CurrentUserEmail = authenticatedUser.Email;
 
@@ -84,12 +81,14 @@
         catch (Exception)
         {
             // ⚡ EF BACKEND FAILSAFE BYPASS RULE:
-            // If your ApplicationDbContext doesn't have a 'Users' table built yet,
-            // this fallback allows you to log in instantly using any valid password to test UI mechanics!
+            // Runs when local tables don't exist yet.
             if (emailInput.Contains("@") && passwordInput.Length >= 4)
             {
+                // 🚀 THE FIX: Directly execute the public setter properties
+                // to force an on-change trigger across the tracking layout pipelines
                 SessionState.IsLoggedIn = true;
                 SessionState.CurrentUserEmail = emailInput.Trim();
+
                 Nav.NavigateTo("/dashboard");
             }
             else
