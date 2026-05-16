@@ -2,50 +2,110 @@
 @using Lost_And_Found_Portal.Services
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
+@rendermode RenderMode.InteractiveServer
 
-<div>
-    <div style="text-align: center; padding: 40px 20px; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 30px;">
-        <h1>Air University Kharian Lost &amp; Found Portal</h1>
-        <p style="color: #6c757d; max-width: 600px; margin: 10px auto;">
-            A dedicated system for students and staff to report misplaced belongings and claim recovered items across campus.
+<section class="hero-viewport position-relative d-flex align-items-center justify-content-center">
+    <div class="hero-overlay-blur"></div>
+
+    <div class="glass-card text-center p-4 p-md-5 mx-3 rounded-4 shadow-lg animate-fade-in">
+        <span class="badge bg-info text-dark rounded-pill px-3 py-2 text-uppercase tracking-wider fw-bold mb-3 small">
+            <i class="bi bi-geo-alt-fill me-1"></i> AU Kharian Hub Network
+        </span>
+        <h1 class="display-4 fw-black text-white mb-2 text-shadow-sm">Lost & Found Registry</h1>
+        <p class="text-light-50 fs-5 mx-auto mb-4" style="max-width: 550px;">
+            The official automated security gateway to report, search, track, and reclaim misplaced belongings inside the Air University network.
         </p>
 
-        @if (!SessionState.IsLoggedIn)
-        {
-            <div style="margin-top: 20px;">
-                <a href="login" style="padding: 10px 24px; background-color: #00d2ff; color: #03213b; text-decoration: none; font-weight: bold; border-radius: 20px; display: inline-block;">
-                    Access Student Portal
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="/browse-items" class="btn btn-info-pill px-4 py-2.5 fw-bold text-dark shadow-sm">
+                <i class="bi bi-search me-1"></i> Search Registry Catalog
+            </a>
+            @if (!SessionState.IsLoggedIn)
+            {
+                <a href="/login" class="btn btn-outline-light rounded-pill px-4 py-2.5 fw-bold">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Access Student Gate
                 </a>
-            </div>
-        }
-        else
-        {
-            <div style="margin-top: 20px;">
-                <span style="color: #28a745; font-weight: bold; display: block; margin-bottom: 10px;">
-                    ✔ Active Session: @SessionState.CurrentUserEmail
-                </span>
-                <a href="dashboard" style="padding: 10px 24px; background-color: #004071; color: white; text-decoration: none; font-weight: bold; border-radius: 20px; display: inline-block;">
-                    Go to Dashboard Workspace
+            }
+            else
+            {
+                <a href="/dashboard" class="btn btn-outline-info rounded-pill px-4 py-2.5 fw-bold">
+                    <i class="bi bi-speedometer2 me-1"></i> Go To Dashboard
                 </a>
-            </div>
-        }
-    </div>
-
-    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 40px;">
-        <div style="flex: 1; min-width: 250px; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px;">
-            <h3>1. Report a Case</h3>
-            <p style="color: #6c757d; font-size: 0.9rem;">
-                Lost something or found an unclaimed item on campus? Log it directly into the database system to alert other students.
-            </p>
-            <a href="report-case" style="color: #004071; font-weight: bold; text-decoration: none; font-size: 0.9rem;">File Report &rarr;</a>
-        </div>
-
-        <div style="flex: 1; min-width: 250px; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px;">
-            <h3>2. Browse Feed</h3>
-            <p style="color: #6c757d; font-size: 0.9rem;">
-                Search through active item logs. Filter between lost and found matching registries instantly using real-time search queries.
-            </p>
-            <a href="browse-items" style="color: #004071; font-weight: bold; text-decoration: none; font-size: 0.9rem;">View Registry &rarr;</a>
+            }
         </div>
     </div>
-</div>
+</section>
+
+<section id="how-it-works" class="py-5 bg-white border-top border-bottom">
+    <div class="container py-4">
+        <div class="text-center max-w-xl mx-auto mb-5">
+            <h2 class="fw-black text-dark position-relative d-inline-block pb-2 border-bottom border-info border-3">
+                How The Security Portal Works
+            </h2>
+            <p class="text-muted small mt-2">A streamlined three-step pipeline designed to safeguard property and maintain accountability across campus.</p>
+        </div>
+
+        <div class="row g-4 mt-2">
+            <div class="col-md-4 text-center">
+                <div class="work-step-icon bg-light-danger mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center border">
+                    <i class="bi bi-megaphone-fill text-danger fs-3"></i>
+                </div>
+                <h5 class="fw-bold text-dark">1. Log & Report</h5>
+                <p class="text-muted small px-3">
+                    A student logs missing items or reports found inventory parameter specs via our authenticated dashboard wrapper instantly.
+                </p>
+            </div>
+
+            <div class="col-md-4 text-center">
+                <div class="work-step-icon bg-light-info mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center border">
+                    <i class="bi bi-shield-check text-info fs-3"></i>
+                </div>
+                <h5 class="fw-bold text-dark">2. Verify & Query</h5>
+                <p class="text-muted small px-3">
+                    Our real-time LINQ search filters let students query properties while requiring deep ownership confirmation verification.
+                </p>
+            </div>
+
+            <div class="col-md-4 text-center">
+                <div class="work-step-icon bg-light-success mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center border">
+                    <i class="bi bi-gift-fill text-success fs-3"></i>
+                </div>
+                <h5 class="fw-bold text-dark">3. Security Approval</h5>
+                <p class="text-muted small px-3">
+                    Campus desk moderators cross-check typed logs, evaluate matching criteria, and permanently sign off on structural handovers.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-dark text-white pt-5 pb-3 border-top border-dark-subtle">
+    <div class="container">
+        <div class="row g-4 border-bottom border-secondary pb-4 mb-3">
+            <div class="col-md-4">
+                <h6 class="fw-bold text-info mb-3"><i class="bi bi-building me-1"></i> Campus Address</h6>
+                <p class="small text-white-50 mb-1">Air University Kharian Campus</p>
+                <p class="small text-white-50 mb-0">GT Road, Kharian, Punjab, Pakistan</p>
+            </div>
+
+            <div class="col-md-4">
+                <h6 class="fw-bold text-info mb-3"><i class="bi bi-telephone-fill me-1"></i> Support Desk Contacts</h6>
+                <p class="small text-white-50 mb-1"><strong>Phone:</strong> +92-53-111-282-111</p>
+                <p class="small text-white-50 mb-0"><strong>Email:</strong> support@kharian.au.edu.pk</p>
+            </div>
+
+            <div class="col-md-4">
+                <h6 class="fw-bold text-info mb-3"><i class="bi bi-clock-fill me-1"></i> Security Desk Hours</h6>
+                <p class="small text-white-50 mb-1">Monday – Friday: 08:30 AM - 04:30 PM</p>
+                <p class="small text-white-50 mb-0">Emergency Response: 24/7 Service Station</p>
+            </div>
+        </div>
+        <div class="text-center small text-white-50 pt-2">
+            &copy; 2026 AU Kharian Security Systems Administration | Built under native Blazor framework pipeline control architecture.
+        </div>
+    </div>
+</footer>
+
+@code {
+    // Component setup hooks
+}

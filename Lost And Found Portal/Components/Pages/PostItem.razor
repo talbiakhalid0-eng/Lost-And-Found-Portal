@@ -1,247 +1,198 @@
 ﻿@page "/report-case"
 @using Lost_And_Found_Portal.Components.Models
 @using Lost_And_Found_Portal.Components.Services
-@using Lost_And_Found_Portal.Services
 @inject IItemService ItemService
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
 @rendermode RenderMode.InteractiveServer
 
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="card shadow-sm p-4 rounded-4 bg-white border-0 mb-5" style="max-width: 600px; width: 100%;">
-        <div class="border-bottom pb-2 mb-4">
-            <h3 class="fw-bold text-dark"><i class="bi bi-file-earmark-plus-fill text-primary me-2"></i>Report Campus Case</h3>
-            <p class="text-muted small mb-0">Broadcast details about lost or recovered property across the AU network.</p>
-        </div>
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow border-0 rounded-4 p-4 bg-white">
+        <h3 class="fw-bold text-navy mb-3"><i class="bi bi-pencil-square me-2"></i>Report an Item Case</h3>
 
-        @if (!string.IsNullOrEmpty(statusMessage))
+        @if (!SessionState.IsLoggedIn)
         {
-            <div class="alert alert-success small rounded-3 py-2 text-center mb-3">
-                <i class="bi bi-check-circle-fill me-2"></i> @statusMessage
+            <div class="alert alert-danger rounded-3 fw-bold">
+                Access Denied: You must be signed in to submit a report case.
             </div>
+            <a href="login" class="btn btn-outline-primary rounded-pill w-100">Go to Login Page</a>
         }
-
-        <EditForm Model="newItem" OnValidSubmit="HandleCaseSubmission">
-            <DataAnnotationsValidator />
-
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Case Entry Type</label>
-                <div class="d-flex gap-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="caseType" id="typeLost" checked="@newItem.IsLost" @onclick="() => newItem.IsLost = true" />
-                        <label class="form-check-label small fw-semibold text-danger" for="typeLost">
-                            <i class="bi bi-exclamation-circle me-1"></i>Lost Report
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="caseType" id="typeFound" checked="@(!newItem.IsLost)" @onclick="() => newItem.IsLost = false" />
-                        <label class="form-check-label small fw-semibold text-success" for="typeFound">
-                            <i class="bi bi-check-circle me-1"></i>Found/Recovered
-                        </label>
-                    </div>
+        else
+        {
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="alert alert-success rounded-3 fw-bold shadow-sm animate-fade-in">
+                    ✔ @successMessage
                 </div>
-            </div>
+            }
 
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Item Title / Name <span class="text-danger">*</span></label>
-                <input type="text" @bind-value="newItem.Title" class="form-control rounded-3" placeholder="e.g., Black Leather Wallet, HP Laptop Charger" required />
-            </div>
+            @if (!string.IsNullOrEmpty(debugErrorMessage))
+            {
+                <div class="alert alert-danger rounded-3 small fw-bold">
+                    ⚠ @debugErrorMessage
+                </div>
+            }
 
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Inventory Category</label>
-                <select @bind="newItem.Category" class="form-select rounded-3">
-                    <option value="Personal Items">Personal Items</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Documents">Documents/IDs</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
+            <form @submit:preventDefault="ProcessSubmission">
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Item Title / Name <span class="text-danger">*</span></label>
+                    <input type="text" @bind="itemTitle" class="form-control rounded-3 @(validationErrors.ContainsKey("Title") ? "is-invalid" : "")" placeholder="e.g., Keys, Wallet" />
+                    @if (validationErrors.TryGetValue("Title", out var titleErr))
+                    {
+                        <div class="invalid-feedback fw-semibold">@titleErr</div>
+                    }
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Estimated Campus Location <span class="text-danger">*</span></label>
-                <input type="text" @bind-value="newItem.Location" class="form-control rounded-3" placeholder="e.g., Central Library Basement, Faculty Block Cafeteria" required />
-            </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Description</label>
+                    <textarea @bind="itemDescription" rows="3" class="form-control rounded-3" placeholder="Provide details like color, brand..."></textarea>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Reference Image URL</label>
-                <input type="url" @bind-value="newItem.ImageUrl" class="form-control rounded-3" placeholder="https://example.com/item-photo.jpg (Optional)" />
-            </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Category</label>
+                    <select @bind="itemCategory" class="form-select rounded-3">
+                        <option value="Personal Items">Personal Items (Wallet, Bags)</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Documents">Documents/IDs</option>
+                        <option value="Books/Stationery">Books & Stationery</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
 
-            <div class="mb-4">
-                <label class="form-label small fw-bold text-secondary">Detailed Description <span class="text-danger">*</span></label>
-                <textarea @bind="newItem.Description" class="form-control rounded-3" rows="4" placeholder="Provide distinct characteristics like color, brand name, condition, or items inside..." required></textarea>
-            </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Location Found / Lost <span class="text-danger">*</span></label>
+                    <input type="text" @bind="itemLocation" class="form-control rounded-3 @(validationErrors.ContainsKey("Location") ? "is-invalid" : "")" placeholder="e.g., Cafeteria, Block B" />
+                    @if (validationErrors.TryGetValue("Location", out var locErr))
+                    {
+                        <div class="invalid-feedback fw-semibold">@locErr</div>
+                    }
+                </div>
 
-            <div class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-secondary rounded-pill w-50 fw-bold" @onclick='() => Nav.NavigateTo("/dashboard")'>
-                    Cancel
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Contact Info (Phone / WhatsApp) <span class="text-danger">*</span></label>
+                    <input type="text" @bind="itemContactInfo" class="form-control rounded-3 @(validationErrors.ContainsKey("ContactInfo") ? "is-invalid" : "")" placeholder="e.g., 0300-1234567" />
+                    @if (validationErrors.TryGetValue("ContactInfo", out var contactErr))
+                    {
+                        <div class="invalid-feedback fw-semibold">@contactErr</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Image Link / URL</label>
+                    <input type="text" @bind="itemImageUrl" class="form-control rounded-3" placeholder="e.g., https://example.com/image.jpg" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-1">Report Type</label>
+                    <select @bind="isLostString" class="form-select rounded-3">
+                        <option value="True">I Lost This Item (Lost Item)</option>
+                        <option value="False">I Found This Item (Found Item)</option>
+                    </select>
+                </div>
+
+                <button type="submit" disabled="@isProcessing" class="btn btn-navy w-100 rounded-pill py-2 fw-bold shadow-sm">
+                    @if (isProcessing)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Processing Submission...</span>
+                    }
+                    else
+                    {
+                        <span><i class="bi bi-cloud-arrow-up-fill me-1"></i> Submit Report</span>
+                    }
                 </button>
-                <button type="submit" class="btn btn-primary rounded-pill w-50 fw-bold shadow-sm">
-                    <i class="bi bi-cloud-arrow-up-fill me-1"></i>Publish Case
-                </button>
-            </div>
-        </EditForm>
+            </form>
+        }
     </div>
 </div>
 
 @code {
-    private Item newItem = new() 
-    { 
-        Title = "", 
-        Description = "", 
-        Location = "", 
-        Category = "Personal Items", 
-        ImageUrl = "",
-        IsLost = true,
-        ClaimStatus = "Available" // Default inventory tracking state
-    };
-    
-    private string? statusMessage;
+    private string itemTitle = "";
+    private string itemDescription = "";
+    private string itemCategory = "Personal Items";
+    private string itemLocation = "";
+    private string itemContactInfo = "";
+    private string itemImageUrl = "";
+    private string isLostString = "True";
+
+    private string? successMessage;
+    private string? debugErrorMessage;
+    private bool isProcessing = false;
+
+    // Dictionary to track field-specific errors
+    private Dictionary<string, string> validationErrors = new();
 
     protected override void OnInitialized()
     {
-        // Route Guard Protection check
         if (!SessionState.IsLoggedIn)
         {
-            Nav.NavigateTo("login");
+            Nav.NavigateTo("/login");
         }
     }
 
-    private async Task HandleCaseSubmission()
+    private async Task ProcessSubmission()
     {
-        // Inject current user tracking metadata before pipeline insertion
-        newItem.UserEmail = SessionState.CurrentUserEmail;
+        if (isProcessing) return;
 
-        // Save raw record directly into database backend
-        await ItemService.AddItemAsync(newItem);
+        // Clear out old states
+        validationErrors.Clear();
+        successMessage = null;
+        debugErrorMessage = null;
 
-        statusMessage = "Your report case has been broadcasted successfully!";
-        
-        // Brief visual delay layout refresh before jumping to user panel
-        await Task.Delay(1500);
-        Nav.NavigateTo("/dashboard");
-    }
-}@page "/report-case"
-@using Lost_And_Found_Portal.Components.Models
-@using Lost_And_Found_Portal.Components.Services
-@using Lost_And_Found_Portal.Services
-@inject IItemService ItemService
-@inject UserSessionState SessionState
-@inject NavigationManager Nav
-@rendermode RenderMode.InteractiveServer
+        // 1. FRONTEND USER EXPERIENCE VALIDATION CHECKS
+        if (string.IsNullOrWhiteSpace(itemTitle))
+            validationErrors.Add("Title", "Item Title/Name is strictly required.");
+        else if (itemTitle.Length > 200)
+            validationErrors.Add("Title", "Title cannot exceed 200 characters.");
 
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="card shadow-sm p-4 rounded-4 bg-white border-0 mb-5" style="max-width: 600px; width: 100%;">
-        <div class="border-bottom pb-2 mb-4">
-            <h3 class="fw-bold text-dark"><i class="bi bi-file-earmark-plus-fill text-primary me-2"></i>Report Campus Case</h3>
-            <p class="text-muted small mb-0">Broadcast details about lost or recovered property across the AU network.</p>
-        </div>
+        if (string.IsNullOrWhiteSpace(itemLocation))
+            validationErrors.Add("Location", "Please specify where the item was lost or found.");
+        else if (itemLocation.Length > 200)
+            validationErrors.Add("Location", "Location field details cannot exceed 200 characters.");
 
-        @if (!string.IsNullOrEmpty(statusMessage))
+        if (string.IsNullOrWhiteSpace(itemContactInfo))
+            validationErrors.Add("ContactInfo", "Contact info is required so users can reach you.");
+        else if (itemContactInfo.Length > 150)
+            validationErrors.Add("ContactInfo", "Contact phone or text info cannot exceed 150 characters.");
+
+        // If validation rules fail, stop execution before calling service layer
+        if (validationErrors.Any())
         {
-            <div class="alert alert-success small rounded-3 py-2 text-center mb-3">
-                <i class="bi bi-check-circle-fill me-2"></i> @statusMessage
-            </div>
+            StateHasChanged();
+            return;
         }
 
-        <EditForm Model="newItem" OnValidSubmit="HandleCaseSubmission">
-            <DataAnnotationsValidator />
-
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Case Entry Type</label>
-                <div class="d-flex gap-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="caseType" id="typeLost" checked="@newItem.IsLost" @onclick="() => newItem.IsLost = true" />
-                        <label class="form-check-label small fw-semibold text-danger" for="typeLost">
-                            <i class="bi bi-exclamation-circle me-1"></i>Lost Report
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="caseType" id="typeFound" checked="@(!newItem.IsLost)" @onclick="() => newItem.IsLost = false" />
-                        <label class="form-check-label small fw-semibold text-success" for="typeFound">
-                            <i class="bi bi-check-circle me-1"></i>Found/Recovered
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Item Title / Name <span class="text-danger">*</span></label>
-                <input type="text" @bind-value="newItem.Title" class="form-control rounded-3" placeholder="e.g., Black Leather Wallet, HP Laptop Charger" required />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Inventory Category</label>
-                <select @bind="newItem.Category" class="form-select rounded-3">
-                    <option value="Personal Items">Personal Items</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Documents">Documents/IDs</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Estimated Campus Location <span class="text-danger">*</span></label>
-                <input type="text" @bind-value="newItem.Location" class="form-control rounded-3" placeholder="e.g., Central Library Basement, Faculty Block Cafeteria" required />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label small fw-bold text-secondary">Reference Image URL</label>
-                <input type="url" @bind-value="newItem.ImageUrl" class="form-control rounded-3" placeholder="https://example.com/item-photo.jpg (Optional)" />
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label small fw-bold text-secondary">Detailed Description <span class="text-danger">*</span></label>
-                <textarea @bind="newItem.Description" class="form-control rounded-3" rows="4" placeholder="Provide distinct characteristics like color, brand name, condition, or items inside..." required></textarea>
-            </div>
-
-            <div class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-secondary rounded-pill w-50 fw-bold" @onclick='() => Nav.NavigateTo("/dashboard")'>
-                    Cancel
-                </button>
-                <button type="submit" class="btn btn-primary rounded-pill w-50 fw-bold shadow-sm">
-                    <i class="bi bi-cloud-arrow-up-fill me-1"></i>Publish Case
-                </button>
-            </div>
-        </EditForm>
-    </div>
-</div>
-
-@code {
-    private Item newItem = new() 
-    { 
-        Title = "", 
-        Description = "", 
-        Location = "", 
-        Category = "Personal Items", 
-        ImageUrl = "",
-        IsLost = true,
-        ClaimStatus = "Available" // Default inventory tracking state
-    };
-    
-    private string? statusMessage;
-
-    protected override void OnInitialized()
-    {
-        // Route Guard Protection check
-        if (!SessionState.IsLoggedIn)
+        try
         {
-            Nav.NavigateTo("login");
+            isProcessing = true;
+            StateHasChanged();
+
+            var itemModel = new Item
+            {
+                Title = itemTitle.Trim(),
+                Description = string.IsNullOrWhiteSpace(itemDescription) ? "No description provided." : itemDescription.Trim(),
+                Category = itemCategory,
+                Location = itemLocation.Trim(),
+                ContactInfo = itemContactInfo.Trim(),
+                ImageUrl = string.IsNullOrWhiteSpace(itemImageUrl) ? "/images/placeholder.png" : itemImageUrl.Trim(),
+                IsLost = bool.Parse(isLostString),
+                UserEmail = SessionState.CurrentUserEmail ?? "anonymous@au.edu.pk",
+                ClaimStatus = "Available"
+            };
+
+            await ItemService.AddItemAsync(itemModel);
+
+            successMessage = "Case reported successfully! Updating workspace dashboard...";
+            StateHasChanged();
+
+            await Task.Delay(1400);
+            Nav.NavigateTo("/dashboard");
         }
-    }
-
-    private async Task HandleCaseSubmission()
-    {
-        // Inject current user tracking metadata before pipeline insertion
-        newItem.UserEmail = SessionState.CurrentUserEmail;
-
-        // Save raw record directly into database backend
-        await ItemService.AddItemAsync(newItem);
-
-        statusMessage = "Your report case has been broadcasted successfully!";
-        
-        // Brief visual delay layout refresh before jumping to user panel
-        await Task.Delay(1500);
-        Nav.NavigateTo("/dashboard");
+        catch (Exception ex)
+        {
+            debugErrorMessage = $"Database rejected request: {ex.GetBaseException().Message}";
+            isProcessing = false;
+            StateHasChanged();
+        }
     }
 }

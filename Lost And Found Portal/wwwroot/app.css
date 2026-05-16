@@ -1,97 +1,79 @@
-/* Custom color palette overrides for AU Kharian theme layout */
-.bg-navy-custom {
-	background-color: #004071 !important;
+/* HERO LAYOUT GRAPHIC GENERATION SYSTEM */
+.hero-viewport {
+	min-height: 85vh;
+	background: url('/images/au-kharian-campus.jpg') no-repeat center center;
+	background-size: cover;
+	isolation: isolate;
 }
 
-.text-navy {
-	color: #004071 !important;
+.hero-overlay-blur {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(135deg, rgba(10, 25, 47, 0.85), rgba(17, 34, 64, 0.7));
+	z-index: -1;
 }
 
+/* TRANSLUCENT GLASS CARD OVERLAY SPECIFICATION */
+.glass-card {
+	background: rgba(255, 255, 255, 0.08) !important;
+	backdrop-filter: blur(12px) saturate(160%) !important;
+	-webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+	border: 1px solid rgba(255, 255, 255, 0.15) !important;
+	max-width: 750px;
+}
+
+/* DECORATION PILL RULES */
 .btn-info-pill {
-	background-color: #00d2ff !important;
-	border: none;
-	border-radius: 50px !important;
-	color: #03213b !important;
-	font-weight: bold;
-}
-
-.nav-link-custom {
-	color: #ffffff !important;
-	text-decoration: none !important;
-	font-size: 0.9rem;
-	padding: 8px 12px;
-}
-
-	.nav-link-custom:hover {
-		color: #00d2ff !important;
-	}
-
-/* Fix grid formatting behavior on data lists */
-.hover-lift {
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-	.hover-lift:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-	}
-
-/* GLOBAL LAYOUT STABILIZATION */
-.page-wrapper {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
-	background-color: #f8f9fa;
-}
-
-.app-header {
-	background-color: #0a192f !important;
-	color: #ffffff !important;
-	z-index: 1000;
-}
-
-.brand-title {
-	font-size: 1.25rem;
-	color: #64ffda;
-	cursor: pointer;
-}
-
-/* CUSTOM NAV LINKS */
-.nav-link-custom {
-	color: #cbd5e1;
-	text-decoration: none;
-	font-size: 0.9rem;
-	font-weight: 500;
-	transition: color 0.2s ease;
-}
-
-	.nav-link-custom:hover {
-		color: #64ffda;
-	}
-
-.admin-link {
-	color: #fbcfe8 !important; /* Soft distinct color for admin routes */
-}
-
-	.admin-link:hover {
-		color: #f472b6 !important;
-	}
-
-/* CARDS AND STYLING UTILITIES */
-.btn-navy {
-	background-color: #0a192f !important;
-	color: #ffffff !important;
-}
-
-	.btn-navy:hover {
-		background-color: #172a45 !important;
-		color: #64ffda !important;
-	}
-
-.text-navy {
+	background-color: #64ffda !important;
 	color: #0a192f !important;
+	border-radius: 50px;
+	transition: all 0.2s ease;
 }
 
-.xsmall {
-	font-size: 0.75rem;
+	.btn-info-pill:hover {
+		background-color: #52deb9 !important;
+		transform: translateY(-2px);
+	}
+
+/* UTILITIES */
+.bg-light-danger {
+	background-color: #fee2e2;
+}
+
+.bg-light-info {
+	background-color: #e0f2fe;
+}
+
+.bg-light-success {
+	background-color: #dcfce7;
+}
+
+.work-step-icon {
+	width: 70px;
+	height: 70px;
+}
+
+.fw-black {
+	font-weight: 900;
+}
+
+.text-shadow-sm {
+	text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ENTRANCE FADE ANIMATION */
+.animate-fade-in {
+	animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
