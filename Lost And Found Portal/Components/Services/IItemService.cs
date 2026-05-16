@@ -1,15 +1,12 @@
 ﻿using Lost_And_Found_Portal.Components.Models;
 
-namespace Lost_And_Found_Portal.Services
+namespace Lost_And_Found_Portal.Components.Services
 {
 	public interface IItemService
 	{
-		Task<bool> CreateItemAsync(Item item);
-		Task<List<Item>> GetAllItemsAsync();
-		Task<bool> DeleteItemAsync(int id);
-		Task<bool> UpdateItemAsync(Item item);
-		Task<bool> RegisterUserAsync(RegisterModel model);
-
-		Task<bool> LoginUserAsync(string email, string password);
+		Task<IEnumerable<Item>> GetAllItemsAsync();
+		Task AddItemAsync(Item item);
+		Task UpdateItemAsync(Item item);
+		Task DeleteItemAsync(int id);
 	}
 }

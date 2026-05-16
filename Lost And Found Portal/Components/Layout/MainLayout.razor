@@ -1,46 +1,28 @@
 ﻿@inherits LayoutComponentBase
 @using Lost_And_Found_Portal.Services
 @inject UserSessionState SessionState
-@implements IDisposable
 
 <div class="page">
-    <NavMenu />
+    <div class="sidebar">
+        <NavMenu />
+    </div>
 
     <main>
-        @Body
-    </main>
-
-    <footer class="text-white py-5 mt-5 border-top border-secondary" style="background-color: #1a1a1a;">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5 class="text-info fw-bold">Air University Kharian Campus</h5>
-                    <p class="small text-secondary">Security Management & Lost and Found System.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="small text-secondary">&copy; 2026 AU Kharian Security Portal v1.0</p>
-                    <a href="#" class="text-info small text-decoration-none">Privacy Policy</a> |
-                    <a href="#" class="text-info small text-decoration-none">Contact Admin</a>
-                </div>
-            </div>
+        <div class="top-row px-4">
+            @if (SessionState.IsLoggedIn)
+            {
+                <span class="me-3 text-secondary">Logged in as: <strong>@SessionState.CurrentUserEmail</strong></span>
+                <button class="btn btn-sm btn-outline-danger rounded-pill" @onclick="SessionState.Logout">Sign Out</button>
+            }
+            else
+            {
+                <a href="login" class="btn btn-sm btn-info rounded-pill px-3">Sign In</a>
+            }
         </div>
-    </footer>
+
+        <article class="content px-4">
+            @* CRITICAL FIX: This tells Blazor exactly where to inject your pages! *@
+            @Body
+        </article>
+    </main>
 </div>
-
-@code {
-    protected override void OnInitialized()
-    {
-        // Force the whole layout tree to refresh when a student logs in or out
-        SessionState.OnStateChange += HandleStateChanged;
-    }
-
-    private void HandleStateChanged()
-    {
-        InvokeAsync(StateHasChanged);
-    }
-
-    public void Dispose()
-    {
-        SessionState.OnStateChange -= HandleStateChanged;
-    }
-}

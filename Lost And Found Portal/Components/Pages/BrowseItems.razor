@@ -1,0 +1,115 @@
+﻿@page "/browse-items"
+@using Lost_And_Found_Portal.Components.Models
+@using Lost_And_Found_Portal.Components.Services
+@using Lost_And_Found_Portal.Services
+@inject IItemService ItemService
+@inject UserSessionState SessionState
+@rendermode RenderMode.InteractiveServer
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">Active Registry Feed</h2>
+        <input type="text" @bind="searchQuery" @bind:event="oninput" class="form-control w-25 rounded-pill" placeholder="🔍 Search items..." />
+    </div>
+
+    <div class="mb-4 text-center">
+        <button class="btn btn-sm rounded-pill me-2 @(filterType == "All" ? "btn-dark" : "btn-outline-dark")" @onclick='() => filterType = "All"'>Show All</button>
+        <button class="btn btn-sm rounded-pill me-2 @(filterType == "Lost" ? "btn-danger" : "btn-outline-danger")" @onclick='() => filterType = "Lost"'>Lost Items</button>
+        <button class="btn btn-sm rounded-pill @(filterType == "Found" ? "btn-success" : "btn-outline-success")" @onclick='() => filterType = "Found"'>Found Items</button>
+    </div>
+
+    @if (filteredItems == null)
+    {
+        <p class="text-center text-muted">Loading live reports registry...</p>
+    }
+    else if (!filteredItems.Any())
+    {
+        <p class="text-center text-muted py-5">No matching item reports found matching your criteria.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in filteredItems)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm rounded-3 overflow-hidden border-0">
+                        <div class="p-3 text-white text-center fw-bold @(item.IsLost ? "bg-danger" : "bg-success")">
+                            @(item.IsLost ? "LOST CASE" : "FOUND CASE")
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@item.Title</h5>
+                            <p class="card-text text-muted mb-1"><i class="bi bi-geo-alt-fill me-1"></i> @item.Location</p>
+                            <p class="small text-secondary mb-3">Reported By: @item.UserEmail</p>
+
+                            @if (SessionState.IsLoggedIn)
+                            {
+                                @if (item.UserEmail == SessionState.CurrentUserEmail)
+                                {
+                                    <button class="btn btn-secondary w-100 rounded-pill btn-sm" disabled>Your Post</button>
+                                }
+                                else if (item.ClaimStatus == "Claimed")
+                                {
+                                    <button class="btn btn-light w-100 rounded-pill btn-sm text-muted" disabled>Claimed by @item.ClaimedByEmail</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary w-100 rounded-pill btn-sm shadow-sm" @onclick="() => InitiateClaimRequest(item)">
+                                        Claim This Item
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-dark d-block text-center py-2 rounded-pill">Sign in to Claim</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private IEnumerable<Item>? allItems;
+    private string searchQuery = "";
+    private string filterType = "All";
+
+    protected override async Task OnInitializedAsync()
+    {
+        allItems = await ItemService.GetAllItemsAsync();
+    }
+
+    private IEnumerable<Item> filteredItems
+    {
+        get
+        {
+            if (allItems == null) return Enumerable.Empty<Item>();
+
+            var results = allItems;
+
+            // Apply text query matching
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                results = results.Where(i => i.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                             i.Location.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Apply type filtering
+            if (filterType == "Lost") results = results.Where(i => i.IsLost);
+            if (filterType == "Found") results = results.Where(i => !i.IsLost);
+
+            return results;
+        }
+    }
+
+    private async Task InitiateClaimRequest(Item item)
+    {
+        item.ClaimedByEmail = SessionState.CurrentUserEmail;
+        item.ClaimStatus = "Claimed";
+        await ItemService.UpdateItemAsync(item);
+
+        // Refresh local data cache view
+        allItems = await ItemService.GetAllItemsAsync();
+    }
+}

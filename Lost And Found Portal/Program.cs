@@ -12,7 +12,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IItemService, ItemService>();
-builder.Services.AddScoped<UserSessionState>();
+builder.Services.AddSingleton<UserSessionState>();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -34,7 +34,9 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
+
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+   .AddInteractiveServerRenderMode();
 
 app.Run();
