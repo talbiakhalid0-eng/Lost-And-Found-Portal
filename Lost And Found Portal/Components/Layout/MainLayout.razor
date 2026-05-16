@@ -1,10 +1,51 @@
 ﻿@inherits LayoutComponentBase
 @using Lost_And_Found_Portal.Components.Layout
 
-<div class="app-fullscreen-wrapper">
-    <NavMenu @rendermode="RenderMode.InteractiveServer" />
+<div class="app-fullscreen-wrapper d-flex flex-column" style="min-height: 100vh; background-color: #0a192f;">
 
-    <main>
-        @Body
+    <header class="w-100 sticky-top shadow-sm z-3">
+        <NavMenu @rendermode="RenderMode.InteractiveServer" />
+    </header>
+
+    <main class="flex-grow-1 w-100 px-2 px-sm-3 px-md-4 py-4 mt-2">
+        <div class="container-xl responsive-content-boundary h-100">
+            @Body
+        </div>
     </main>
+
 </div>
+
+<style>
+    /* Absolute capping boundaries to maximize viewing scale across monitor classes */
+    .responsive-content-boundary {
+        max-width: 1280px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Core Application Reset Metrics */
+    html, body {
+        background-color: #0a192f !important;
+        overflow-x: hidden;
+        font-size: 14px;
+    }
+
+    /* System Typography Scaling via Device Queries */
+    @@media (min-width: 576px) {
+        html, body {
+            font-size: 14.5px;
+        }
+    }
+
+    @@media (min-width: 768px) {
+        html, body {
+            font-size: 15px;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+        html, body {
+            font-size: 16px;
+        }
+    }
+</style>
