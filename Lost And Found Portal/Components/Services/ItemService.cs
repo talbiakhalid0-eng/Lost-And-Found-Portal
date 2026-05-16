@@ -20,21 +20,14 @@ namespace Lost_And_Found_Portal.Components.Services
 
 		public async Task AddItemAsync(Item item)
 		{
-			// Now that properties exist in Item.cs, these guards will compile perfectly
-			if (string.IsNullOrWhiteSpace(item.Description))
-			{
-				item.Description = "No description provided.";
-			}
-
-			if (string.IsNullOrWhiteSpace(item.Category))
-			{
-				item.Category = "General";
-			}
-
-			if (string.IsNullOrWhiteSpace(item.ImageUrl))
-			{
-				item.ImageUrl = "/images/placeholder.png";
-			}
+			// Set robust defaults for any property left blank by the user form
+			item.Title ??= "Untitled Item";
+			item.Description ??= "No description provided.";
+			item.Category ??= "General";
+			item.Location ??= "Campus Grounds";
+			item.ImageUrl ??= "/images/placeholder.png";
+			item.UserEmail ??= "anonymous@au.edu.pk";
+			item.ClaimStatus ??= "Available";
 
 			_context.Items.Add(item);
 			await _context.SaveChangesAsync();
