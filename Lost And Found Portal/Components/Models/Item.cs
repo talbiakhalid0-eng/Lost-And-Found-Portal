@@ -11,7 +11,8 @@
 		public string? ImageUrl { get; set; }
 		public bool IsLost { get; set; }
 		public string UserEmail { get; set; } = string.Empty;
+		public string ClaimStatus { get; set; } = "Available"; // Available, PendingApproval, Claimed
 		public string? ClaimedByEmail { get; set; }
-		public string ClaimStatus { get; set; } = "Available";
+		public string? ClaimProofOfOwnership { get; set; }
 	}
 }
