@@ -55,7 +55,10 @@
         }
 
         // Lock the authenticated user data straight into our running Singleton memory block
-        SessionState.Login(emailInput);
+        SessionState.IsLoggedIn = true;
+        SessionState.CurrentUserEmail = validUser.Email; // Use your local user object variable name here
+
+        Nav.NavigateTo("dashboard");
 
         // Move the user instantly into the application dashboard
         Nav.NavigateTo("/dashboard");

@@ -1,7 +1,6 @@
 ﻿@using Lost_And_Found_Portal.Services
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
-@implements IDisposable
 
 <header class="navbar navbar-expand-md navbar-dark bg-navy-custom px-4 shadow-sm">
     <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between">
@@ -64,18 +63,6 @@
 </header>
 
 @code {
-    protected override void OnInitialized()
-    {
-        // Subscribe layout components safely to updates
-        SessionState.OnStateChange += HandleStateChange;
-    }
-
-    private async void HandleStateChange()
-    {
-        // Forces the UI update to occur safely on the main thread dispatcher
-        await InvokeAsync(StateHasChanged);
-    }
-
     private bool IsUserAdmin()
     {
         if (string.IsNullOrEmpty(SessionState.CurrentUserEmail)) return false;
@@ -86,13 +73,8 @@
 
     private void LogUserOut()
     {
-        SessionState.Logout();
+        // 🚀 FIX: Call the updated centralized session cleaner
+        SessionState.ClearSession();
         Nav.NavigateTo("/");
-    }
-
-    public void Dispose()
-    {
-        // Always un-subscribe to prevent thread memory leaks
-        SessionState.OnStateChange -= HandleStateChange;
     }
 }
