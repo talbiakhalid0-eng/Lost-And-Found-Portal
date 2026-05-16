@@ -7,81 +7,72 @@
 @inject NavigationManager Nav
 @rendermode RenderMode.InteractiveServer
 
-<div class="container mt-5">
-    <div class="card shadow p-4 mx-auto rounded-4" style="max-width: 600px; border: none;">
-        <h2 class="fw-bold text-center text-primary mb-4">Report an Item Case</h2>
+<div>
+    <h3>Report an Item Case</h3>
 
-        @if (!SessionState.IsLoggedIn)
+    @if (!SessionState.IsLoggedIn)
+    {
+        <p style="color: red; font-weight: bold;">Access Denied: You must be signed in to submit a report case.</p>
+        <a href="login">Go to Login Page</a>
+    }
+    else
+    {
+        @if (!string.IsNullOrEmpty(successMessage))
         {
-            <div class="alert alert-warning text-center">
-                <h5>Access Denied</h5>
-                <p class="small">You must be signed in to submit a report case.</p>
-                <a href="login" class="btn btn-sm btn-primary rounded-pill px-3">Go to Login</a>
-            </div>
+            <div style="color: green; font-weight: bold; margin-bottom: 15px;">@successMessage</div>
         }
-        else
-        {
-            @if (!string.IsNullOrEmpty(successMessage))
-            {
-                <div class="alert alert-success text-center">@successMessage</div>
-            }
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Item Title / Name</label>
-                <input type="text" @bind="itemTitle" class="form-control" placeholder="e.g., Black Leather Wallet, Keys" />
+        <EditForm Model="itemModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Item Title / Name:</label>
+                <InputText @bind-Value="itemModel.Title" style="width: 100%; max-width: 400px; padding: 6px;" placeholder="e.g., Keys, Black Leather Wallet" />
+                <div style="color: red; font-size: 0.85rem;"><ValidationMessage For="() => itemModel.Title" /></div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Location Found / Lost</label>
-                <input type="text" @bind="itemLocation" class="form-control" placeholder="e.g., Cafeteria, Block B Room 4" />
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Location Found / Lost:</label>
+                <InputText @bind-Value="itemModel.Location" style="width: 100%; max-width: 400px; padding: 6px;" placeholder="e.g., Cafeteria, Block B Room 4" />
+                <div style="color: red; font-size: 0.85rem;"><ValidationMessage For="() => itemModel.Location" /></div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Report Type</label>
-                <select @bind="isLostSelection" class="form-select">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Report Type:</label>
+                <InputSelect @bind-Value="isLostString" style="width: 100%; max-width: 400px; padding: 6px;">
                     <option value="True">I Lost This Item (Lost Item)</option>
                     <option value="False">I Found This Item (Found Item)</option>
-                </select>
+                </InputSelect>
             </div>
 
-            <div class="mb-4">
-                <label class="form-label fw-semibold">Simulated Image Attachment Link</label>
-                <input type="text" @bind="imageUrlInput" class="form-control" placeholder="Paste image address URL or leave empty" />
-            </div>
-
-            <button @onclick="SubmitItemCase" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm">
+            <button type="submit" style="padding: 8px 24px; background-color: #004071; color: white; border: none; font-weight: bold; cursor: pointer;">
                 Submit Report
             </button>
-        }
-    </div>
+        </EditForm>
+    }
 </div>
 
 @code {
-    private string itemTitle = "";
-    private string itemLocation = "";
-    private string isLostSelection = "True";
-    private string imageUrlInput = "";
+    private Item itemModel = new Item();
+    private string isLostString = "True";
     private string? successMessage;
 
-    private async Task SubmitItemCase()
+    protected override void OnInitialized()
     {
-        if (string.IsNullOrEmpty(itemTitle) || string.IsNullOrEmpty(itemLocation))
+        if (!SessionState.IsLoggedIn)
         {
-            return;
+            Nav.NavigateTo("/login");
         }
+    }
 
-        var newItem = new Item
-        {
-            Title = itemTitle,
-            Location = itemLocation,
-            IsLost = bool.Parse(isLostSelection),
-            ImageUrl = string.IsNullOrEmpty(imageUrlInput) ? "images/placeholder.png" : imageUrlInput,
-            UserEmail = SessionState.CurrentUserEmail,
-            IsApproved = true, // Auto-approve for local staging test
-            ClaimStatus = "Available"
-        };
+    private async Task HandleValidSubmit()
+    {
+        // Bind settings from localized fields onto our submission object record
+        itemModel.IsLost = bool.Parse(isLostString);
+        itemModel.UserEmail = SessionState.CurrentUserEmail ?? "anonymous@au.edu.pk";
+        itemModel.ClaimStatus = "Available";
 
-        await ItemService.AddItemAsync(newItem);
+        await ItemService.AddItemAsync(itemModel);
         successMessage = "Case reported successfully!";
 
         await Task.Delay(1500);
