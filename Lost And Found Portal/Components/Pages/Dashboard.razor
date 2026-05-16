@@ -1,25 +1,138 @@
 ﻿@page "/dashboard"
+@using Lost_And_Found_Portal.Components.Models
+@using Lost_And_Found_Portal.Components.Services
 @using Lost_And_Found_Portal.Services
+@inject IItemService ItemService
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
 @rendermode RenderMode.InteractiveServer
 
-<div class="container mt-5 pt-5">
-    <div class="card p-5 shadow rounded-4 text-center">
-        <h1 class="fw-bold text-success"><i class="bi bi-check-circle-fill"></i> Welcome to the Dashboard!</h1>
-        <p class="text-muted mt-2">You have successfully authenticated into the AU Kharian Portal.</p>
-        <div class="alert alert-info d-inline-block mx-auto px-4 py-2 mt-3 rounded-pill">
-            Current User: <strong>@SessionState.CurrentUserEmail</strong>
-        </div>
-    </div>
+<div>
+    <h3>Dashboard Workspace</h3>
+    <p>Logged in user tracking session: <strong>@SessionState.CurrentUserEmail</strong></p>
+
+    <hr />
+
+    <h4>My Reported Cases</h4>
+    @if (myReports == null)
+    {
+        <p>Loading personal case registers...</p>
+    }
+    else if (!myReports.Any())
+    {
+        <p>You have not logged any item reports yet.</p>
+    }
+    else
+    {
+        <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; margin-bottom: 30px;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>Item Title</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Claim Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in myReports)
+                {
+                    <tr>
+                        <td><strong>@item.Title</strong></td>
+                        <td>@item.Location</td>
+                        <td>@(item.IsLost ? "Lost" : "Found")</td>
+                        <td>
+                            @if (item.ClaimStatus == "Claimed")
+                            {
+                                <span>Claimed by <em>@item.ClaimedByEmail</em></span>
+                            }
+                            else
+                            {
+                                <span>Available / Unclaimed</span>
+                            }
+                        </td>
+                        <td>
+                            <button @onclick="() => RemoveReportedItem(item.Id)" style="color: red; font-weight: bold; cursor: pointer;">
+                                Remove Case
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <h4>My Claimed Items</h4>
+    @if (myClaims == null)
+    {
+        <p>Loading claim parameters...</p>
+    }
+    else if (!myClaims.Any())
+    {
+        <p>You haven't claimed any reported items yet.</p>
+    }
+    else
+    {
+        <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>Item Title</th>
+                    <th>Found Location</th>
+                    <th>Original Reporter</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in myClaims)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Location</td>
+                        <td>@item.UserEmail</td>
+                        <td><span style="color: green; font-weight: bold;">@item.ClaimStatus</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
 
 @code {
-    protected override void OnInitialized()
+    private List<Item>? myReports;
+    private List<Item>? myClaims;
+
+    protected override async Task OnInitializedAsync()
     {
+        // Enforce basic auth gate routing
         if (!SessionState.IsLoggedIn)
         {
             Nav.NavigateTo("/login");
+            return;
         }
+
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        var allItems = await ItemService.GetAllItemsAsync();
+
+        if (allItems != null)
+        {
+            // Filter out items matching this user's logged email session
+            myReports = allItems.Where(i => i.UserEmail == SessionState.CurrentUserEmail).ToList();
+
+            // Filter out items belonging to others that this user claimed
+            myClaims = allItems.Where(i => i.ClaimedByEmail == SessionState.CurrentUserEmail).ToList();
+        }
+    }
+
+    private async Task RemoveReportedItem(int itemId)
+    {
+        // Call the data access layer service to run database removal
+        await ItemService.DeleteItemAsync(itemId);
+
+        // Re-query the system back-to-back to drop item from view instantly
+        await LoadDashboardData();
     }
 }
