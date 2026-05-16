@@ -6,80 +6,104 @@
 @inject NavigationManager Nav
 @rendermode RenderMode.InteractiveServer
 
-<div>
-    <h3>Report an Item Case</h3>
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow border-0 rounded-4 p-4 bg-white">
+        <h3 class="fw-bold text-navy mb-3"><i class="bi bi-pencil-square me-2"></i>Report an Item Case</h3>
 
-    @if (!SessionState.IsLoggedIn)
-    {
-        <p style="color: red; font-weight: bold;">Access Denied: You must be signed in to submit a report case.</p>
-        <a href="login">Go to Login Page</a>
-    }
-    else
-    {
-        @if (!string.IsNullOrEmpty(successMessage))
+        @if (!SessionState.IsLoggedIn)
         {
-            <div style="color: green; font-weight: bold; margin-bottom: 15px; padding: 10px; background-color: #e6f4ea; border-radius: 4px;">
-                ✔ @successMessage
+            <div class="alert alert-danger rounded-3 fw-bold">
+                Access Denied: You must be signed in to submit a report case.
             </div>
+            <a href="login" class="btn btn-outline-primary rounded-pill w-100">Go to Login Page</a>
         }
-
-        @if (!string.IsNullOrEmpty(debugErrorMessage))
+        else
         {
-            <div style="color: red; font-weight: bold; margin-bottom: 15px; padding: 10px; background-color: #fce8e6; border-radius: 4px;">
-                ⚠ @debugErrorMessage
-            </div>
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="alert alert-success rounded-3 fw-bold shadow-sm animate-fade-in">
+                    ✔ @successMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(debugErrorMessage))
+            {
+                <div class="alert alert-danger rounded-3 small fw-bold">
+                    ⚠ @debugErrorMessage
+                </div>
+            }
+
+            <form @submit:preventDefault="ProcessSubmission">
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Item Title / Name <span class="text-danger">*</span></label>
+                    <input type="text" @bind="itemTitle" class="form-control rounded-3 @(validationErrors.ContainsKey("Title") ? "is-invalid" : "")" placeholder="e.g., Keys, Wallet" />
+                    @if (validationErrors.TryGetValue("Title", out var titleErr))
+                    {
+                        <div class="invalid-feedback fw-semibold">@titleErr</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Description</label>
+                    <textarea @bind="itemDescription" rows="3" class="form-control rounded-3" placeholder="Provide details like color, brand..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Category</label>
+                    <select @bind="itemCategory" class="form-select rounded-3">
+                        <option value="Personal Items">Personal Items (Wallet, Bags)</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Documents">Documents/IDs</option>
+                        <option value="Books/Stationery">Books & Stationery</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Location Found / Lost <span class="text-danger">*</span></label>
+                    <input type="text" @bind="itemLocation" class="form-control rounded-3 @(validationErrors.ContainsKey("Location") ? "is-invalid" : "")" placeholder="e.g., Cafeteria, Block B" />
+                    @if (validationErrors.TryGetValue("Location", out var locErr))
+                    {
+                        <div class="invalid-feedback fw-semibold">@locErr</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Contact Info (Phone / WhatsApp) <span class="text-danger">*</span></label>
+                    <input type="text" @bind="itemContactInfo" class="form-control rounded-3 @(validationErrors.ContainsKey("ContactInfo") ? "is-invalid" : "")" placeholder="e.g., 0300-1234567" />
+                    @if (validationErrors.TryGetValue("ContactInfo", out var contactErr))
+                    {
+                        <div class="invalid-feedback fw-semibold">@contactErr</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">Image Link / URL</label>
+                    <input type="text" @bind="itemImageUrl" class="form-control rounded-3" placeholder="e.g., https://example.com/image.jpg" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-1">Report Type</label>
+                    <select @bind="isLostString" class="form-select rounded-3">
+                        <option value="True">I Lost This Item (Lost Item)</option>
+                        <option value="False">I Found This Item (Found Item)</option>
+                    </select>
+                </div>
+
+                <button type="submit" disabled="@isProcessing" class="btn btn-navy w-100 rounded-pill py-2 fw-bold shadow-sm">
+                    @if (isProcessing)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Processing Submission...</span>
+                    }
+                    else
+                    {
+                        <span><i class="bi bi-cloud-arrow-up-fill me-1"></i> Submit Report</span>
+                    }
+                </button>
+            </form>
         }
-
-        <div style="max-width: 400px;">
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Item Title / Name:</label>
-                <input type="text" @bind="itemTitle" style="width: 100%; padding: 6px;" placeholder="e.g., Keys, Wallet" />
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Description:</label>
-                <textarea @bind="itemDescription" rows="3" style="width: 100%; padding: 6px; resize: vertical;" placeholder="Provide details like color, brand..."></textarea>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Category:</label>
-                <select @bind="itemCategory" style="width: 100%; padding: 6px;">
-                    <option value="Personal Items">Personal Items (Wallet, Bags)</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Documents">Documents/IDs</option>
-                    <option value="Books/Stationery">Books & Stationery</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Location Found / Lost:</label>
-                <input type="text" @bind="itemLocation" style="width: 100%; padding: 6px;" placeholder="e.g., Cafeteria, Block B" />
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Contact Info (Phone / WhatsApp):</label>
-                <input type="text" @bind="itemContactInfo" style="width: 100%; padding: 6px;" placeholder="e.g., 0300-1234567" />
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Image Link / URL:</label>
-                <input type="text" @bind="itemImageUrl" style="width: 100%; padding: 6px;" placeholder="e.g., /images/placeholder.png" />
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Report Type:</label>
-                <select @bind="isLostString" style="width: 100%; padding: 6px;">
-                    <option value="True">I Lost This Item (Lost Item)</option>
-                    <option value="False">I Found This Item (Found Item)</option>
-                </select>
-            </div>
-
-            <button type="button" @onclick="ProcessSubmission" disabled="@isProcessing" style="padding: 10px 24px; background-color: #004071; color: white; border: none; font-weight: bold; cursor: @(isProcessing ? "not-allowed" : "pointer"); width: 100%; opacity: @(isProcessing ? "0.6" : "1");">
-                @(isProcessing ? "Processing Submission..." : "Submit Report")
-            </button>
-        </div>
-    }
+    </div>
 </div>
 
 @code {
@@ -95,6 +119,9 @@
     private string? debugErrorMessage;
     private bool isProcessing = false;
 
+    // Dictionary to track field-specific errors
+    private Dictionary<string, string> validationErrors = new();
+
     protected override void OnInitialized()
     {
         if (!SessionState.IsLoggedIn)
@@ -107,44 +134,63 @@
     {
         if (isProcessing) return;
 
+        // Clear out old states
+        validationErrors.Clear();
+        successMessage = null;
+        debugErrorMessage = null;
+
+        // 1. FRONTEND USER EXPERIENCE VALIDATION CHECKS
+        if (string.IsNullOrWhiteSpace(itemTitle))
+            validationErrors.Add("Title", "Item Title/Name is strictly required.");
+        else if (itemTitle.Length > 200)
+            validationErrors.Add("Title", "Title cannot exceed 200 characters.");
+
+        if (string.IsNullOrWhiteSpace(itemLocation))
+            validationErrors.Add("Location", "Please specify where the item was lost or found.");
+        else if (itemLocation.Length > 200)
+            validationErrors.Add("Location", "Location field details cannot exceed 200 characters.");
+
+        if (string.IsNullOrWhiteSpace(itemContactInfo))
+            validationErrors.Add("ContactInfo", "Contact info is required so users can reach you.");
+        else if (itemContactInfo.Length > 150)
+            validationErrors.Add("ContactInfo", "Contact phone or text info cannot exceed 150 characters.");
+
+        // If validation rules fail, stop execution before calling service layer
+        if (validationErrors.Any())
+        {
+            StateHasChanged();
+            return;
+        }
+
         try
         {
             isProcessing = true;
-            successMessage = null;
-            debugErrorMessage = null;
             StateHasChanged();
-
-            // Validation Safety Fallbacks
-            if (string.IsNullOrWhiteSpace(itemTitle)) itemTitle = "Untitled Item";
-            if (string.IsNullOrWhiteSpace(itemLocation)) itemLocation = "Campus Grounds";
-            if (string.IsNullOrWhiteSpace(itemContactInfo)) itemContactInfo = "None Provided";
 
             var itemModel = new Item
             {
-                Title = itemTitle,
-                Description = string.IsNullOrWhiteSpace(itemDescription) ? "No description provided." : itemDescription,
+                Title = itemTitle.Trim(),
+                Description = string.IsNullOrWhiteSpace(itemDescription) ? "No description provided." : itemDescription.Trim(),
                 Category = itemCategory,
-                Location = itemLocation,
-                ContactInfo = itemContactInfo,
-                ImageUrl = string.IsNullOrWhiteSpace(itemImageUrl) ? "/images/placeholder.png" : itemImageUrl,
+                Location = itemLocation.Trim(),
+                ContactInfo = itemContactInfo.Trim(),
+                ImageUrl = string.IsNullOrWhiteSpace(itemImageUrl) ? "/images/placeholder.png" : itemImageUrl.Trim(),
                 IsLost = bool.Parse(isLostString),
                 UserEmail = SessionState.CurrentUserEmail ?? "anonymous@au.edu.pk",
                 ClaimStatus = "Available"
-                // The old broken UserId field mapping is gone for good!
             };
 
-            // Entity Framework cleanly tracks and saves this directly to your database now
             await ItemService.AddItemAsync(itemModel);
 
-            successMessage = "Case reported successfully! Redirecting...";
+            successMessage = "Case reported successfully! Updating workspace dashboard...";
             StateHasChanged();
 
-            await Task.Delay(1500);
+            await Task.Delay(1400);
             Nav.NavigateTo("/dashboard");
         }
         catch (Exception ex)
         {
-            debugErrorMessage = $"Submission blocked: {ex.Message}";
+            debugErrorMessage = $"Database rejected request: {ex.GetBaseException().Message}";
             isProcessing = false;
             StateHasChanged();
         }
