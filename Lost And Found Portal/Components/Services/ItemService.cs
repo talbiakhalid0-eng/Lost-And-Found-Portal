@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Lost_And_Found_Portal.Components.Models;
-using Lost_And_Found_Portal.Components.Data;
+using Lost_And_Found_Portal.Components.Data; // Ensure this matches where your ApplicationDbContext lives
 
 namespace Lost_And_Found_Portal.Components.Services
 {
 	public class ItemService : IItemService
 	{
-		// CRITICAL FIX: This field must be declared so the constructor can use it!
-		private readonly LostAndFoundPortalContext _context;
+		// 1. Declare the private field variable at the class level
+		private readonly ApplicationDbContext _context;
 
-		// The constructor receives the database context from Program.cs and stores it
-		public ItemService(LostAndFoundPortalContext context)
+		// 2. Pass the context into the constructor and assign it to the field variable
+		public ItemService(ApplicationDbContext context)
 		{
 			_context = context;
 		}
