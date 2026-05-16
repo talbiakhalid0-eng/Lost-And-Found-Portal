@@ -62,7 +62,8 @@ body {
    ========================================================================== */
 .hero-isolated-container {
 	min-height: 80vh;
-	background: linear-gradient(rgba(10, 25, 47, 0.2), rgba(10, 25, 47, 0.4)), url('/Images/Uploads/au-kharian-campus.jpg') no-repeat center center;
+	/* 🚀 THE FIX: Removed the color linear-gradient completely */
+	background: url('/Images/Uploads/au-kharian-campus.jpg') no-repeat center center;
 	background-size: cover;
 	display: flex;
 	align-items: center;
