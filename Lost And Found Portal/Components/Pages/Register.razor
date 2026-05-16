@@ -130,8 +130,9 @@
         }
 
         // --- EXPLICIT AU CAMPUS EMAIL DOMAIN VALIDATOR ---
+        // 🎯 FIX: Changed '@@' to single '@' since we are inside a native C# code block context
         var cleanEmail = email.Trim().ToLower();
-        if (!cleanEmail.EndsWith("@@students.au.edu.pk") && !cleanEmail.EndsWith("@@au.edu.pk"))
+        if (!cleanEmail.EndsWith("@students.au.edu.pk") && !cleanEmail.EndsWith("@au.edu.pk"))
         {
             errorMessage = "Access Blocked: You must use an official Air University address (e.g., @students.au.edu.pk).";
             return;
