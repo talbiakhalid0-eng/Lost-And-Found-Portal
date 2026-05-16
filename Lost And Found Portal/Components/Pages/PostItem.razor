@@ -22,40 +22,46 @@
             <div style="color: green; font-weight: bold; margin-bottom: 15px;">@successMessage</div>
         }
 
-        <EditForm Model="itemModel" OnValidSubmit="HandleValidSubmit">
-            <DataAnnotationsValidator />
-
+        <div style="max-width: 400px;">
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Item Title / Name:</label>
-                <InputText @bind-Value="itemModel.Title" style="width: 100%; max-width: 400px; padding: 6px;" placeholder="e.g., Keys, Black Leather Wallet" />
-                <div style="color: red; font-size: 0.85rem;"><ValidationMessage For="() => itemModel.Title" /></div>
+                <input type="text" @bind="itemTitle" style="width: 100%; padding: 6px;" placeholder="e.g., Keys, Wallet" />
+                @if (showErrors && string.IsNullOrWhiteSpace(itemTitle))
+                {
+                    <div style="color: red; font-size: 0.85rem;">Please provide an item title.</div>
+                }
             </div>
 
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Location Found / Lost:</label>
-                <InputText @bind-Value="itemModel.Location" style="width: 100%; max-width: 400px; padding: 6px;" placeholder="e.g., Cafeteria, Block B Room 4" />
-                <div style="color: red; font-size: 0.85rem;"><ValidationMessage For="() => itemModel.Location" /></div>
+                <input type="text" @bind="itemLocation" style="width: 100%; padding: 6px;" placeholder="e.g., Cafeteria, Block B" />
+                @if (showErrors && string.IsNullOrWhiteSpace(itemLocation))
+                {
+                    <div style="color: red; font-size: 0.85rem;">Please specify a campus location.</div>
+                }
             </div>
 
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Report Type:</label>
-                <InputSelect @bind-Value="isLostString" style="width: 100%; max-width: 400px; padding: 6px;">
+                <select @bind="isLostString" style="width: 100%; padding: 6px;">
                     <option value="True">I Lost This Item (Lost Item)</option>
                     <option value="False">I Found This Item (Found Item)</option>
-                </InputSelect>
+                </select>
             </div>
 
-            <button type="submit" style="padding: 8px 24px; background-color: #004071; color: white; border: none; font-weight: bold; cursor: pointer;">
+            <button type="button" @onclick="ProcessSubmission" style="padding: 8px 24px; background-color: #004071; color: white; border: none; font-weight: bold; cursor: pointer;">
                 Submit Report
             </button>
-        </EditForm>
+        </div>
     }
 </div>
 
 @code {
-    private Item itemModel = new Item();
+    private string itemTitle = "";
+    private string itemLocation = "";
     private string isLostString = "True";
     private string? successMessage;
+    private bool showErrors = false;
 
     protected override void OnInitialized()
     {
@@ -65,17 +71,30 @@
         }
     }
 
-    private async Task HandleValidSubmit()
+    private async Task ProcessSubmission()
     {
-        // Bind settings from localized fields onto our submission object record
-        itemModel.IsLost = bool.Parse(isLostString);
-        itemModel.UserEmail = SessionState.CurrentUserEmail ?? "anonymous@au.edu.pk";
-        itemModel.ClaimStatus = "Available";
+        showErrors = false;
+
+        // Clean internal validation check
+        if (string.IsNullOrWhiteSpace(itemTitle) || string.IsNullOrWhiteSpace(itemLocation))
+        {
+            showErrors = true;
+            return;
+        }
+
+        var itemModel = new Item
+        {
+            Title = itemTitle,
+            Location = itemLocation,
+            IsLost = bool.Parse(isLostString),
+            UserEmail = SessionState.CurrentUserEmail ?? "anonymous@au.edu.pk",
+            ClaimStatus = "Available"
+        };
 
         await ItemService.AddItemAsync(itemModel);
         successMessage = "Case reported successfully!";
 
-        await Task.Delay(1500);
+        await Task.Delay(1200);
         Nav.NavigateTo("/dashboard");
     }
 }
