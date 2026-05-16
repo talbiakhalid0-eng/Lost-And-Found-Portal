@@ -1,7 +1,51 @@
 ﻿@page "/"
+@using Lost_And_Found_Portal.Services
+@inject UserSessionState SessionState
+@inject NavigationManager Nav
 
-<div class="container mt-5 text-center">
-    <h1 class="display-4 fw-bold text-primary">AU Kharian Lost &amp; Found Portal</h1>
-    <p class="lead text-muted">A secure space for students to report and track items.</p>
-    <a href="login" class="btn btn-info btn-lg rounded-pill px-5 fw-bold mt-3">Get Started</a>
+<div>
+    <div style="text-align: center; padding: 40px 20px; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 30px;">
+        <h1>Air University Kharian Lost &amp; Found Portal</h1>
+        <p style="color: #6c757d; max-width: 600px; margin: 10px auto;">
+            A dedicated system for students and staff to report misplaced belongings and claim recovered items across campus.
+        </p>
+
+        @if (!SessionState.IsLoggedIn)
+        {
+            <div style="margin-top: 20px;">
+                <a href="login" style="padding: 10px 24px; background-color: #00d2ff; color: #03213b; text-decoration: none; font-weight: bold; border-radius: 20px; display: inline-block;">
+                    Access Student Portal
+                </a>
+            </div>
+        }
+        else
+        {
+            <div style="margin-top: 20px;">
+                <span style="color: #28a745; font-weight: bold; display: block; margin-bottom: 10px;">
+                    ✔ Active Session: @SessionState.CurrentUserEmail
+                </span>
+                <a href="dashboard" style="padding: 10px 24px; background-color: #004071; color: white; text-decoration: none; font-weight: bold; border-radius: 20px; display: inline-block;">
+                    Go to Dashboard Workspace
+                </a>
+            </div>
+        }
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 40px;">
+        <div style="flex: 1; min-width: 250px; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px;">
+            <h3>1. Report a Case</h3>
+            <p style="color: #6c757d; font-size: 0.9rem;">
+                Lost something or found an unclaimed item on campus? Log it directly into the database system to alert other students.
+            </p>
+            <a href="report-case" style="color: #004071; font-weight: bold; text-decoration: none; font-size: 0.9rem;">File Report &rarr;</a>
+        </div>
+
+        <div style="flex: 1; min-width: 250px; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px;">
+            <h3>2. Browse Feed</h3>
+            <p style="color: #6c757d; font-size: 0.9rem;">
+                Search through active item logs. Filter between lost and found matching registries instantly using real-time search queries.
+            </p>
+            <a href="browse-items" style="color: #004071; font-weight: bold; text-decoration: none; font-size: 0.9rem;">View Registry &rarr;</a>
+        </div>
+    </div>
 </div>
