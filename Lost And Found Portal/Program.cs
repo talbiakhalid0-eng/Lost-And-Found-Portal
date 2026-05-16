@@ -13,7 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddSingleton<UserSessionState>();
+builder.Services.AddScoped<UserSessionState>();
 
 
 var app = builder.Build();

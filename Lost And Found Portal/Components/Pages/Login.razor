@@ -1,6 +1,7 @@
 ﻿@page "/login"
 @using Lost_And_Found_Portal.Services
 @inject UserSessionState SessionState
+@inject NavigationManager Nav
 @inject IUserService UserService
 @rendermode RenderMode.InteractiveServer
 
@@ -71,7 +72,7 @@
                 SessionState.CurrentUserEmail = authenticatedUser.Email;
 
                 // Move the user instantly into the application dashboard workspace
-                Nav.NavigateTo("/dashboard");
+                Nav.NavigateTo("/dashboard", forceLoad: true);
             }
             else
             {
@@ -89,7 +90,7 @@
                 SessionState.IsLoggedIn = true;
                 SessionState.CurrentUserEmail = emailInput.Trim();
 
-                Nav.NavigateTo("/dashboard");
+                Nav.NavigateTo("/dashboard", forceLoad: true);
             }
             else
             {

@@ -40,27 +40,39 @@
 </nav>
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // 🚀 THE FIX: Register this component to listen for changes inside the session service state
-        SessionState.OnChange += HandleStateHasChanged;
+        if (firstRender)
+        {
+            // 🚀 THE CRITICAL FIX: Load from browser storage *after* rendering to handle the full page reload safely
+            await SessionState.LoadSessionFromBrowserAsync();
+
+            // Subscribe to our unified state alteration notifier loop
+            SessionState.OnChange += HandleStateHasChanged;
+
+            // Force a layout tree refresh now that credentials have been retrieved
+            StateHasChanged();
+        }
     }
 
     private void HandleStateHasChanged()
     {
-        // Force the navbar tree structure to completely evaluate and update visually
+        // Safely force cross-thread interactive rendering updates inside your active SignalR hub
         InvokeAsync(StateHasChanged);
     }
 
-    private void LogUserOut()
+    private async Task LogUserOut()
     {
-        SessionState.ClearSession();
-        Nav.NavigateTo("/");
+        // Clean out your browser storage tokens asynchronously
+        await SessionState.ClearSession();
+
+        // Push the user back out onto the landing route
+        Nav.NavigateTo("/", forceLoad: true);
     }
 
     public void Dispose()
     {
-        // 🚀 THE FIX: Always unregister when layout tears down to avoid critical component memory leaks
+        // Securely unhook event tracking links to eliminate memory leak overhead risks
         SessionState.OnChange -= HandleStateHasChanged;
     }
 }

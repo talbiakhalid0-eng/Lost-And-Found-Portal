@@ -1,34 +1,100 @@
-﻿namespace Lost_And_Found_Portal.Services
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.JSInterop;
+
+namespace Lost_And_Found_Portal.Services
 {
 	public class UserSessionState
 	{
-		// 🚀 Fully accessible setters to fix CS0200, CS0272, and CS1061 errors completely!
-		public bool IsLoggedIn { get; set; } = false;
-		public string CurrentUserEmail { get; set; } = "";
+		private readonly IJSRuntime _jsRuntime;
+		private bool _isLoggedIn = false;
+		private string _currentUserEmail = "";
 
-		// Event backing to allow navbar refreshes
-		public event Action? OnStateChange;
+		// Combined into a single consistent event for all components to subscribe to
+		public event Action? OnChange;
 
-		public void Login(string email)
+		// 🚀 THE FIX: Inject IJSRuntime so the state container can talk to the browser storage
+		public UserSessionState(IJSRuntime jsRuntime)
+		{
+			_jsRuntime = jsRuntime;
+		}
+
+		public bool IsLoggedIn
+		{
+			get => _isLoggedIn;
+			set
+			{
+				if (_isLoggedIn != value)
+				{
+					_isLoggedIn = value;
+					NotifyStateChanged();
+				}
+			}
+		}
+
+		public string CurrentUserEmail
+		{
+			get => _currentUserEmail;
+			set
+			{
+				if (_currentUserEmail != value)
+				{
+					_currentUserEmail = value;
+					NotifyStateChanged();
+				}
+			}
+		}
+
+		// 🚀 Modified to save to browser storage so it survives full page reloads
+		public async Task Login(string email)
 		{
 			IsLoggedIn = true;
 			CurrentUserEmail = email;
+
+			try
+			{
+				await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "user_email", email);
+			}
+			catch { /* Catch silently during initial server prerendering */ }
+
 			NotifyStateChanged();
 		}
-		public event Action? OnChange;
 
-		public void Logout()
+		public async Task Logout()
 		{
 			IsLoggedIn = false;
 			CurrentUserEmail = "";
+
+			try
+			{
+				await _jsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "user_email");
+			}
+			catch { /* Catch silently during initial server prerendering */ }
+
 			NotifyStateChanged();
 		}
 
-		public void ClearSession()
+		public async Task ClearSession()
 		{
-			Logout();
+			await Logout();
 		}
 
-		private void NotifyStateChanged() => OnStateChange?.Invoke();
+		// 🚀 NEW METHOD: Call this inside component lifecycle initializations to restore memory states
+		public async Task LoadSessionFromBrowserAsync()
+		{
+			try
+			{
+				var cachedEmail = await _jsRuntime.InvokeAsync<string?>("sessionStorage.getItem", "user_email");
+				if (!string.IsNullOrEmpty(cachedEmail))
+				{
+					_isLoggedIn = true;
+					_currentUserEmail = cachedEmail;
+					NotifyStateChanged();
+				}
+			}
+			catch { /* Catch silently during initial server prerendering */ }
+		}
+
+		private void NotifyStateChanged() => OnChange?.Invoke();
 	}
 }
