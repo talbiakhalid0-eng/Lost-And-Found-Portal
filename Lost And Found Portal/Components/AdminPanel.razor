@@ -1,0 +1,168 @@
+﻿@using Lost_And_Found_Portal.Components.Models
+@using Lost_And_Found_Portal.Components.Services
+@using Lost_And_Found_Portal.Services
+@inject IItemService ItemService
+@inject UserSessionState SessionState
+@rendermode RenderMode.InteractiveServer
+
+<div class="container py-3">
+    @if (!isLoaded)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary mb-2" role="status"></div>
+            <p class="text-muted small">Synchronizing administrative database layers...</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+            <h4 class="fw-bold text-dark mb-3"><i class="bi bi-graph-up-arrow text-primary me-2"></i>System Performance Metrics</h4>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="p-3 bg-light rounded-3 border-start border-primary border-4">
+                        <div class="small text-muted text-uppercase fw-semibold" style="font-size: 11px;">Total Records</div>
+                        <div class="fs-3 fw-bold text-dark">@allItems.Count</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 bg-light rounded-3 border-start border-danger border-4">
+                        <div class="small text-muted text-uppercase fw-semibold" style="font-size: 11px;">Lost Items</div>
+                        <div class="fs-3 fw-bold text-danger">@allItems.Count(i => i.IsLost)</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 bg-light rounded-3 border-start border-success border-4">
+                        <div class="small text-muted text-uppercase fw-semibold" style="font-size: 11px;">Found Items</div>
+                        <div class="fs-3 fw-bold text-success">@allItems.Count(i => !i.IsLost)</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 bg-light rounded-3 border-start border-warning border-4">
+                        <div class="small text-muted text-uppercase fw-semibold" style="font-size: 11px;">Handed Over</div>
+                        <div class="fs-3 fw-bold text-warning">@allItems.Count(i => i.ClaimStatus == "Claimed")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+            <div class="p-4 bg-light border-bottom">
+                <h4 class="fw-bold text-dark mb-1"><i class="bi bi-shield-check-fill text-danger me-2"></i>Security Moderation Desk</h4>
+                <p class="text-muted small mb-0">Approve pending ownership matches or purge entries securely.</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark small text-uppercase" style="font-size: 11px;">
+                        <tr>
+                            <th class="ps-4">Item Profile</th>
+                            <th>Status State</th>
+                            <th>Claimant Identity</th>
+                            <th>Submitted Ownership Proof</th>
+                            <th class="text-center pe-4">Resolution Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        @if (!allItems.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No campus inventory entries logged in system database.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in allItems)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark">@item.Title</div>
+                                        <div class="text-muted xsmall" style="font-size: 11px;"><i class="bi bi-geo-alt"></i> @item.Location | @item.Category</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge px-2 py-1 rounded-pill @(item.ClaimStatus == "Claimed" ? "bg-success text-white" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark fw-bold" : "bg-light text-muted border")">
+                                            @item.ClaimStatus
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="font-monospace text-secondary fw-semibold">@(item.ClaimedByEmail ?? "None / Open")</span>
+                                    </td>
+                                    <td style="max-width: 250px;" class="text-wrap">
+                                        @if (!string.IsNullOrEmpty(item.ClaimProofOfOwnership))
+                                        {
+                                            <div class="p-2 rounded bg-light border font-monospace text-dark" style="font-size: 11px;">
+                                                "@item.ClaimProofOfOwnership"
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted italic small">No active claim filed</span>
+                                        }
+                                    </td>
+                                    <td class="text-center pe-4">
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            @if (item.ClaimStatus == "PendingApproval")
+                                            {
+                                                <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm" @onclick="() => HandleClaim(item, true)">
+                                                    Approve
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" @onclick="() => HandleClaim(item, false)">
+                                                    Reject
+                                                </button>
+                                            }
+                                            <button class="btn btn-sm btn-danger rounded-pill px-2" title="Delete record permanently" @onclick="() => DeleteRecord(item.Id)">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Item> allItems = new();
+    private bool isLoaded = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RefreshData();
+            isLoaded = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        var items = await ItemService.GetAllItemsAsync();
+        allItems = items.OrderByDescending(i => i.Id).ToList();
+    }
+
+    private async Task HandleClaim(Item item, bool approve)
+    {
+        if (approve)
+        {
+            item.ClaimStatus = "Claimed";
+        }
+        else
+        {
+            item.ClaimStatus = "Available";
+            item.ClaimedByEmail = null;
+            item.ClaimProofOfOwnership = null;
+        }
+        await ItemService.UpdateItemAsync(item);
+        await RefreshData();
+    }
+
+    private async Task DeleteRecord(int id)
+    {
+        await ItemService.DeleteItemAsync(id);
+        await RefreshData();
+    }
+}

@@ -31,120 +31,249 @@
             </div>
         </div>
 
-        <h4 class="fw-bold text-white mt-4 mb-3">My Reported Cases</h4>
-        @if (myReportedCases == null)
+        @if (IsUserAdmin())
         {
-            <p class="text-muted small">Loading records...</p>
-        }
-        else if (!myReportedCases.Any())
-        {
-            <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
-                You haven't reported any lost or found items yet.
-            </p>
-        }
-        else
-        {
-            <div class="table-responsive mb-5 shadow-sm rounded-3">
-                <table class="table table-bordered align-middle bg-white mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Item Title</th>
-                            <th>Location</th>
-                            <th>Type</th>
-                            <th>Claim Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in myReportedCases)
-                        {
-                            <tr>
-                                <td class="fw-bold">@item.Title</td>
-                                <td>@item.Location</td>
-                                <td><span class="badge @(item.IsLost ? "bg-danger" : "bg-success")">@(item.IsLost ? "Lost" : "Found")</span></td>
-                                <td>
-                                    <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark" : "bg-secondary")">
-                                        @item.ClaimStatus
-                                    </span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveCase(item.Id)">Remove Case</button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="d-flex border-bottom mb-4 gap-2" style="border-color: rgba(255,255,255,0.1) !important;">
+                <button class="btn @(activeTab == "user" ? "btn-info text-dark fw-bold" : "btn-outline-light") px-4 py-2 rounded-top-3 border-bottom-0"
+                        style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;"
+                        @onclick='() => ChangeTab("user")'>
+                    <i class="bi bi-person-workspace me-2"></i>My Student Workspace
+                </button>
+                <button class="btn @(activeTab == "admin" ? "btn-danger text-white fw-bold" : "btn-outline-danger") px-4 py-2 rounded-top-3 border-bottom-0"
+                        style="border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important;"
+                        @onclick='() => ChangeTab("admin")'>
+                    <i class="bi bi-shield-lock-fill me-2"></i>Campus Admin Desk
+                </button>
             </div>
         }
 
-        <h4 class="fw-bold text-white mt-4 mb-3">My Claimed Items</h4>
-        @if (myClaimedItems == null)
+        @if (activeTab == "admin" && IsUserAdmin())
         {
-            <p class="text-muted small">Loading records...</p>
-        }
-        else if (!myClaimedItems.Any())
-        {
-            <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
-                You haven't claimed any reported items yet.
-            </p>
-        }
-        else
-        {
-            <div class="table-responsive shadow-sm rounded-3">
-                <table class="table table-bordered align-middle bg-white mb-0">
-                    <thead class="table-light">
+            <div class="card border-0 shadow-sm p-4 mb-4 rounded-4" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1) !important;">
+                <h4 class="fw-bold text-info mb-3"><i class="bi bi-graph-up-arrow me-2"></i>System Performance Metrics</h4>
+                <div class="row g-3 text-white">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border-start border-primary border-4">
+                            <div class="text-white-50 small text-uppercase fw-semibold" style="font-size: 11px;">Total Database Records</div>
+                            <div class="fs-3 fw-bold text-white">@allSystemItems.Count</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border-start border-danger border-4">
+                            <div class="text-white-50 small text-uppercase fw-semibold" style="font-size: 11px;">Lost Items Posted</div>
+                            <div class="fs-3 fw-bold text-danger">@allSystemItems.Count(i => i.IsLost)</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border-start border-success border-4">
+                            <div class="text-white-50 small text-uppercase fw-semibold" style="font-size: 11px;">Found Items Posted</div>
+                            <div class="fs-3 fw-bold text-success">@allSystemItems.Count(i => !i.IsLost)</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border-start border-warning border-4">
+                            <div class="text-white-50 small text-uppercase fw-semibold" style="font-size: 11px;">Successfully Claimed</div>
+                            <div class="fs-3 fw-bold text-warning">@allSystemItems.Count(i => i.ClaimStatus == "Claimed")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="fw-bold text-white mt-4 mb-3"><i class="bi bi-shield-check-fill text-danger me-2"></i>Master Security Moderation Desk</h4>
+            <div class="table-responsive mb-5 shadow-sm rounded-4 overflow-hidden border" style="border-color: rgba(255,255,255,0.1) !important;">
+                <table class="table table-hover align-middle mb-0" style="background: #1e1e24; color: #ffffff;">
+                    <thead class="small text-uppercase text-white" style="background: #111115;">
                         <tr>
-                            <th>Item Title</th>
-                            <th>Found Location</th>
-                            <th>Verification Status</th>
-                            <th>Your Submitted Proof</th>
+                            <th class="py-3 ps-4 border-0 text-info">Item Info</th>
+                            <th class="py-3 border-0 text-info">Current Status</th>
+                            <th class="py-3 border-0 text-info">Claimant Account</th>
+                            <th class="py-3 border-0 text-info">Submitted Ownership Proof</th>
+                            <th class="py-3 text-center border-0 text-info">Moderator Resolution Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach (var item in myClaimedItems)
+                    <tbody class="small">
+                        @if (!allSystemItems.Any())
                         {
                             <tr>
-                                <td class="fw-bold text-primary">@item.Title</td>
-                                <td>@item.Location</td>
-                                <td>
-                                    <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : "bg-warning text-dark fw-bold")">
-                                        @(item.ClaimStatus == "Claimed" ? "Approved & Verified" : "Awaiting Admin Approval")
-                                    </span>
-                                </td>
-                                <td class="font-monospace text-muted xsmall">"@item.ClaimProofOfOwnership"</td>
+                                <td colspan="5" class="text-center py-4 text-white-50" style="background: #1e1e24;">No database logs registered on system backend index.</td>
                             </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in allSystemItems)
+                            {
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); background: #1e1e24;">
+                                    <td class="ps-4 py-3 text-white">
+                                        <div class="fw-bold fs-6">@item.Title</div>
+                                        <small class="text-white-50 fw-normal"><i class="bi bi-geo-alt text-info me-1"></i> @item.Location | @item.Category</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge px-3 py-2 rounded-pill shadow-sm @(item.ClaimStatus == "Claimed" ? "bg-success text-white" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark fw-bold" : "bg-secondary text-white")">
+                                            @item.ClaimStatus
+                                        </span>
+                                    </td>
+                                    <td class="font-monospace text-info fw-semibold">@(item.ClaimedByEmail ?? "None / Available")</td>
+                                    <td style="max-width: 260px;" class="text-wrap">
+                                        @if (!string.IsNullOrEmpty(item.ClaimProofOfOwnership))
+                                        {
+                                            <div class="p-2 rounded text-white-50 font-monospace border border-secondary border-opacity-25" style="font-size: 11px; background: rgba(0,0,0,0.25); max-height: 60px; overflow-y: auto;">
+                                                "@item.ClaimProofOfOwnership"
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="fst-italic text-white-50 opacity-50">No claims submitted</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            @if (item.ClaimStatus == "PendingApproval")
+                                            {
+                                                <button class="btn btn-sm btn-success fw-bold px-3 py-1.5 rounded-pill shadow-sm" @onclick="() => AuthorizeClaimState(item, true)">
+                                                    <i class="bi bi-check-circle-fill me-1"></i> Approve
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger fw-bold px-3 py-1.5 rounded-pill" @onclick="() => AuthorizeClaimState(item, false)">
+                                                    <i class="bi bi-x-circle-fill me-1"></i> Reject
+                                                </button>
+                                            }
+                                            <button class="btn btn-sm btn-danger px-2.5 py-1.5 rounded-circle shadow-sm" title="Purge entry permanently" @onclick="() => PurgeSystemRecord(item.Id)">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
             </div>
+        }
+        else
+        {
+            <h4 class="fw-bold text-white mt-4 mb-3"><i class="bi bi-folder-fill text-info me-2"></i>My Reported Cases</h4>
+            @if (myReportedCases == null)
+            {
+                <div class="d-flex align-items-center gap-2 text-white-50 p-2">
+                    <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                    <small>Loading records...</small>
+                </div>
+            }
+            else if (!myReportedCases.Any())
+            {
+                <p class="text-white-50 small p-3 rounded-3 border" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08) !important;">
+                    You haven't reported any lost or found items yet.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive mb-5 shadow-sm rounded-4 overflow-hidden border border-secondary border-opacity-25">
+                    <table class="table align-middle mb-0" style="background: #1e1e24; color: #ffffff;">
+                        <thead class="small text-uppercase text-white" style="background: #111115;">
+                            <tr>
+                                <th class="py-3 ps-4 text-info">Item Title</th>
+                                <th class="py-3 text-info">Location</th>
+                                <th class="py-3 text-info">Type</th>
+                                <th class="py-3 text-info">Claim Status</th>
+                                <th class="py-3 text-center text-info">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in myReportedCases)
+                            {
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); background: #1e1e24;">
+                                    <td class="fw-bold py-3 ps-4 text-white">@item.Title</td>
+                                    <td class="text-white-50">@item.Location</td>
+                                    <td><span class="badge @(item.IsLost ? "bg-danger" : "bg-success")">@(item.IsLost ? "Lost" : "Found")</span></td>
+                                    <td>
+                                        <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success text-white" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark fw-bold" : "bg-secondary text-white")">
+                                            @item.ClaimStatus
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" @onclick="() => RemoveCase(item.Id)">
+                                            <i class="bi bi-trash me-1"></i>Remove Case
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <h4 class="fw-bold text-white mt-4 mb-3"><i class="bi bi-shield-check text-success me-2"></i>My Claimed Items</h4>
+            @if (myClaimedItems == null)
+            {
+                <div class="d-flex align-items-center gap-2 text-white-50 p-2">
+                    <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                    <small>Loading records...</small>
+                </div>
+            }
+            else if (!myClaimedItems.Any())
+            {
+                <p class="text-white-50 small p-3 rounded-3 border" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08) !important;">
+                    You haven't claimed any reported items yet.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive shadow-sm rounded-4 overflow-hidden border border-secondary border-opacity-25">
+                    <table class="table align-middle mb-0" style="background: #1e1e24; color: #ffffff;">
+                        <thead class="small text-uppercase text-white" style="background: #111115;">
+                            <tr>
+                                <th class="py-3 ps-4 text-info">Item Title</th>
+                                <th class="py-3 text-info">Found Location</th>
+                                <th class="py-3 text-info">Verification Status</th>
+                                <th class="py-3 text-info">Your Submitted Proof</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in myClaimedItems)
+                            {
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); background: #1e1e24;">
+                                    <td class="fw-bold py-3 ps-4 text-info">@item.Title</td>
+                                    <td class="text-white-50">@item.Location</td>
+                                    <td>
+                                        <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success text-white" : "bg-warning text-dark fw-bold")">
+                                            @(item.ClaimStatus == "Claimed" ? "Approved & Verified" : "Awaiting Admin Approval")
+                                        </span>
+                                    </td>
+                                    <td class="font-monospace text-white-50">
+                                        <div class="p-2 rounded border border-secondary border-opacity-25" style="font-size: 11px; background: rgba(0,0,0,0.25);">
+                                            "@item.ClaimProofOfOwnership"
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
         }
     }
 </div>
 
 @code {
+    private List<Item> allSystemItems = new();
     private List<Item>? myReportedCases;
     private List<Item>? myClaimedItems;
     private bool isAuthorizing = true;
+    private string activeTab = "user";
 
-    // 🚀 THE FIX: Move checking logic to AfterRender so JSRuntime can access sessionStorage first
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Pull the authenticated email out of the browser cache
             await SessionState.LoadSessionFromBrowserAsync();
 
             if (!SessionState.IsLoggedIn)
             {
-                // Truly unauthenticated - kick back to login smoothly
                 Nav.NavigateTo("login");
                 return;
             }
 
-            // Session confirmed. Load user items
             await LoadDashboardData();
 
-            // Turn off loader gate and paint workspace layout
             isAuthorizing = false;
             StateHasChanged();
         }
@@ -155,15 +284,54 @@
         if (string.IsNullOrEmpty(SessionState.CurrentUserEmail)) return;
 
         var items = await ItemService.GetAllItemsAsync();
+        var rawList = items.ToList();
 
-        // Filter items securely by active email key metrics
-        myReportedCases = items.Where(i => i.UserEmail?.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
-        myClaimedItems = items.Where(i => i.ClaimedByEmail?.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
+        myReportedCases = rawList.Where(i => i.UserEmail?.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
+        myClaimedItems = rawList.Where(i => i.ClaimedByEmail?.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
+        allSystemItems = rawList.OrderByDescending(i => i.Id).ToList();
+    }
+
+    private void ChangeTab(string tabName)
+    {
+        activeTab = tabName;
+    }
+
+    private bool IsUserAdmin()
+    {
+        if (string.IsNullOrEmpty(SessionState.CurrentUserEmail)) return false;
+
+        var email = SessionState.CurrentUserEmail.ToLower().Trim();
+        return email.Contains("admin") ||
+               email == "247240@students.au.edu.pk" ||
+               email.StartsWith("247240");
     }
 
     private async Task RemoveCase(int id)
     {
         await ItemService.DeleteItemAsync(id);
+        await LoadDashboardData();
+    }
+
+    private async Task AuthorizeClaimState(Item item, bool isApproved)
+    {
+        if (isApproved)
+        {
+            item.ClaimStatus = "Claimed";
+        }
+        else
+        {
+            item.ClaimStatus = "Available";
+            item.ClaimedByEmail = null;
+            item.ClaimProofOfOwnership = null;
+        }
+
+        await ItemService.UpdateItemAsync(item);
+        await LoadDashboardData();
+    }
+
+    private async Task PurgeSystemRecord(int itemId)
+    {
+        await ItemService.DeleteItemAsync(itemId);
         await LoadDashboardData();
     }
 }
