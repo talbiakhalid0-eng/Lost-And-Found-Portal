@@ -1,5 +1,6 @@
 using Lost_And_Found_Portal.Components;
 using Lost_And_Found_Portal.Components.Data;
+using Lost_And_Found_Portal.Components.Services;
 using Lost_And_Found_Portal.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<UserSessionState>();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
