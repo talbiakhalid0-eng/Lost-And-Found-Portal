@@ -20,15 +20,12 @@ namespace Lost_And_Found_Portal.Components.Services
 				.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && u.Password == password);
 		}
 
-		public async Task<bool> RegisterUserAsync(User user)
+		public async Task<bool> RegisterUserAsync(User newUser)
 		{
-			// Safeguard against duplicate registrations
-			var emailExists = await _context.Users
-				.AnyAsync(u => u.Email.ToLower() == user.Email.ToLower());
+			var exists = await _context.Users.AnyAsync(u => u.Email.ToLower() == newUser.Email.ToLower());
+			if (exists) return false;
 
-			if (emailExists) return false;
-
-			_context.Users.Add(user);
+			_context.Users.Add(newUser);
 			await _context.SaveChangesAsync();
 			return true;
 		}
