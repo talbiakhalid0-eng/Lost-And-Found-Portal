@@ -1,0 +1,61 @@
+﻿@page "/admin/dashboard"
+@namespace Lost_And_Found_Portal.Components.Admin
+@using Lost_And_Found_Portal.Services
+@inject UserSessionState SessionState
+@inject NavigationManager Nav
+@rendermode RenderMode.InteractiveServer
+
+<div class="container py-4" style="margin-top: 100px;">
+    @if (isAuthorizing)
+    {
+        <div class="text-center my-5 p-5">
+            <div class="spinner-border text-info mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+            <h5 class="text-white fw-bold">Verifying Administrator Clearance...</h5>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5 border-bottom pb-3" style="border-color: rgba(255,255,255,0.1) !important;">
+            <div>
+                <h2 class="fw-bold text-white mb-1" style="font-family: 'Playfair Display', serif;">Central Command Center</h2>
+                <p class="text-white-50 small m-0">Institutional Analytics Overview & Moderation Desk</p>
+            </div>
+            <span class="badge bg-info text-dark fw-bold px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-shield-fill-check me-1"></i> Admin Authorization Active
+            </span>
+        </div>
+
+        <div class="mb-5">
+            <Analytics />
+        </div>
+
+        <hr class="my-5" style="border-color: rgba(255,255,255,0.1) !important;" />
+
+        <div class="mb-5">
+            <Moderation />
+        </div>
+    }
+</div>
+
+@code {
+    private bool isAuthorizing = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SessionState.LoadSessionFromBrowserAsync();
+
+            // Safety Validation Guardrail
+            if (!SessionState.IsLoggedIn ||
+               (!SessionState.CurrentUserEmail.Contains("admin") && SessionState.CurrentUserEmail != "247220@students.au.edu.pk"))
+            {
+                Nav.NavigateTo("/dashboard");
+                return;
+            }
+
+            isAuthorizing = false;
+            StateHasChanged();
+        }
+    }
+}

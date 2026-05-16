@@ -9,129 +9,155 @@
 
 <div class="container py-4" style="margin-top: 100px;">
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom pb-3" style="border-color: rgba(255,255,255,0.1) !important;">
-        <div>
-            <h2 class="fw-bold text-white mb-1" style="font-family: 'Playfair Display', serif;">Dashboard Workspace</h2>
-            <p class="text-white-50 small m-0">Logged in user tracking session: <strong class="text-info">@SessionState.CurrentUserEmail</strong></p>
-        </div>
-        <div>
-            <a href="report-case" class="btn btn-info text-dark fw-bold px-4 py-2.5 rounded-pill shadow-sm d-inline-flex align-items-center transition-transform">
-                <i class="bi bi-plus-circle-fill me-2 fs-5"></i> File New Case Report
-            </a>
-        </div>
-    </div>
-
-    <h4 class="fw-bold text-white mt-4 mb-3">My Reported Cases</h4>
-    @if (myReportedCases == null)
+    @if (isAuthorizing)
     {
-        <p class="text-muted small">Loading records...</p>
-    }
-    else if (!myReportedCases.Any())
-    {
-        <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
-            You haven't reported any lost or found items yet.
-        </p>
+        <div class="text-center my-5 p-5">
+            <div class="spinner-border text-info mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+            <h5 class="text-white fw-bold">Verifying University Portal Session...</h5>
+            <p class="text-white-50 small">Synchronizing browser credentials securely.</p>
+        </div>
     }
     else
     {
-        <div class="table-responsive mb-5 shadow-sm rounded-3">
-            <table class="table table-bordered align-middle bg-white mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Item Title</th>
-                        <th>Location</th>
-                        <th>Type</th>
-                        <th>Claim Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in myReportedCases)
-                    {
-                        <tr>
-                            <td class="fw-bold">@item.Title</td>
-                            <td>@item.Location</td>
-                            <td><span class="badge @(item.IsLost ? "bg-danger" : "bg-success")">@(item.IsLost ? "Lost" : "Found")</span></td>
-                            <td>
-                                <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark" : "bg-secondary")">
-                                    @item.ClaimStatus
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveCase(item.Id)">Remove Case</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom pb-3" style="border-color: rgba(255,255,255,0.1) !important;">
+            <div>
+                <h2 class="fw-bold text-white mb-1" style="font-family: 'Playfair Display', serif;">Dashboard Workspace</h2>
+                <p class="text-white-50 small m-0">Logged in user tracking session: <strong class="text-info">@SessionState.CurrentUserEmail</strong></p>
+            </div>
+            <div>
+                <a href="report-case" class="btn btn-info text-dark fw-bold px-4 py-2.5 rounded-pill shadow-sm d-inline-flex align-items-center transition-transform">
+                    <i class="bi bi-plus-circle-fill me-2 fs-5"></i> File New Case Report
+                </a>
+            </div>
         </div>
-    }
 
-    <h4 class="fw-bold text-white mt-4 mb-3">My Claimed Items</h4>
-    @if (myClaimedItems == null)
-    {
-        <p class="text-muted small">Loading records...</p>
-    }
-    else if (!myClaimedItems.Any())
-    {
-        <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
-            You haven't claimed any reported items yet.
-        </p>
-    }
-    else
-    {
-        <div class="table-responsive shadow-sm rounded-3">
-            <table class="table table-bordered align-middle bg-white mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Item Title</th>
-                        <th>Found Location</th>
-                        <th>Verification Status</th>
-                        <th>Your Submitted Proof</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in myClaimedItems)
-                    {
+        <h4 class="fw-bold text-white mt-4 mb-3">My Reported Cases</h4>
+        @if (myReportedCases == null)
+        {
+            <p class="text-muted small">Loading records...</p>
+        }
+        else if (!myReportedCases.Any())
+        {
+            <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
+                You haven't reported any lost or found items yet.
+            </p>
+        }
+        else
+        {
+            <div class="table-responsive mb-5 shadow-sm rounded-3">
+                <table class="table table-bordered align-middle bg-white mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <td class="fw-bold text-primary">@item.Title</td>
-                            <td>@item.Location</td>
-                            <td>
-                                <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : "bg-warning text-dark fw-bold")">
-                                    @(item.ClaimStatus == "Claimed" ? "Approved & Verified" : "Awaiting Admin Approval")
-                                </span>
-                            </td>
-                            <td class="font-monospace text-muted xsmall">"@item.ClaimProofOfOwnership"</td>
+                            <th>Item Title</th>
+                            <th>Location</th>
+                            <th>Type</th>
+                            <th>Claim Status</th>
+                            <th>Action</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in myReportedCases)
+                        {
+                            <tr>
+                                <td class="fw-bold">@item.Title</td>
+                                <td>@item.Location</td>
+                                <td><span class="badge @(item.IsLost ? "bg-danger" : "bg-success")">@(item.IsLost ? "Lost" : "Found")</span></td>
+                                <td>
+                                    <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : item.ClaimStatus == "PendingApproval" ? "bg-warning text-dark" : "bg-secondary")">
+                                        @item.ClaimStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveCase(item.Id)">Remove Case</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <h4 class="fw-bold text-white mt-4 mb-3">My Claimed Items</h4>
+        @if (myClaimedItems == null)
+        {
+            <p class="text-muted small">Loading records...</p>
+        }
+        else if (!myClaimedItems.Any())
+        {
+            <p class="text-white-50 small bg-dark p-3 rounded-3 border" style="border-color: rgba(255,255,255,0.08) !important;">
+                You haven't claimed any reported items yet.
+            </p>
+        }
+        else
+        {
+            <div class="table-responsive shadow-sm rounded-3">
+                <table class="table table-bordered align-middle bg-white mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item Title</th>
+                            <th>Found Location</th>
+                            <th>Verification Status</th>
+                            <th>Your Submitted Proof</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in myClaimedItems)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">@item.Title</td>
+                                <td>@item.Location</td>
+                                <td>
+                                    <span class="badge @(item.ClaimStatus == "Claimed" ? "bg-success" : "bg-warning text-dark fw-bold")">
+                                        @(item.ClaimStatus == "Claimed" ? "Approved & Verified" : "Awaiting Admin Approval")
+                                    </span>
+                                </td>
+                                <td class="font-monospace text-muted xsmall">"@item.ClaimProofOfOwnership"</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
     }
 </div>
 
 @code {
     private List<Item>? myReportedCases;
     private List<Item>? myClaimedItems;
+    private bool isAuthorizing = true;
 
-    protected override async Task OnInitializedAsync()
+    // 🚀 THE FIX: Move checking logic to AfterRender so JSRuntime can access sessionStorage first
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!SessionState.IsLoggedIn)
+        if (firstRender)
         {
-            Nav.NavigateTo("login");
-            return;
+            // Pull the authenticated email out of the browser cache
+            await SessionState.LoadSessionFromBrowserAsync();
+
+            if (!SessionState.IsLoggedIn)
+            {
+                // Truly unauthenticated - kick back to login smoothly
+                Nav.NavigateTo("login");
+                return;
+            }
+
+            // Session confirmed. Load user items
+            await LoadDashboardData();
+
+            // Turn off loader gate and paint workspace layout
+            isAuthorizing = false;
+            StateHasChanged();
         }
-        await LoadDashboardData();
     }
 
     private async Task LoadDashboardData()
     {
+        if (string.IsNullOrEmpty(SessionState.CurrentUserEmail)) return;
+
         var items = await ItemService.GetAllItemsAsync();
 
-        // 1. Filter items that THIS user reported
-        myReportedCases = items.Where(i => i.UserEmail.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
-
-        // 2. Filter items that THIS user is currently claiming
+        // Filter items securely by active email key metrics
+        myReportedCases = items.Where(i => i.UserEmail?.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
         myClaimedItems = items.Where(i => i.ClaimedByEmail?.ToLower() == SessionState.CurrentUserEmail.ToLower()).ToList();
     }
 
