@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Lost_And_Found_Portal.Components.Models;
-using Lost_And_Found_Portal.Components.Data; // Ensure this matches where your ApplicationDbContext lives
+using Lost_And_Found_Portal.Components.Data;
 
 namespace Lost_And_Found_Portal.Components.Services
 {
 	public class ItemService : IItemService
 	{
-		// 1. Declare the private field variable at the class level
 		private readonly ApplicationDbContext _context;
 
-		// 2. Pass the context into the constructor and assign it to the field variable
+		public ApplicationDbContext Context => _context;
+
 		public ItemService(ApplicationDbContext context)
 		{
 			_context = context;
@@ -20,8 +20,25 @@ namespace Lost_And_Found_Portal.Components.Services
 			return await _context.Items.ToListAsync();
 		}
 
+		// UPDATE THIS METHOD HERE TO FIX THE NULL COLUMN DATABASE ERRORS
 		public async Task AddItemAsync(Item item)
 		{
+			// If database doesn't allow NULLs, provide automatic fallback placeholders
+			if (string.IsNullOrWhiteSpace(item.Description))
+			{
+				item.Description = "No description provided.";
+			}
+
+			if (string.IsNullOrWhiteSpace(item.Category))
+			{
+				item.Category = "General";
+			}
+
+			if (string.IsNullOrWhiteSpace(item.ImageUrl))
+			{
+				item.ImageUrl = "/images/placeholder.png";
+			}
+
 			_context.Items.Add(item);
 			await _context.SaveChangesAsync();
 		}
