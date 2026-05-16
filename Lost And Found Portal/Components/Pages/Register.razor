@@ -1,1 +1,158 @@
-﻿
+﻿@page "/register"
+@using Lost_And_Found_Portal.Components.Models
+@using Lost_And_Found_Portal.Components.Services
+@using Lost_And_Found_Portal.Services
+@inject IUserService UserService
+@inject NavigationManager Nav
+@rendermode RenderMode.InteractiveServer
+
+<div class="container mt-5" style="max-width: 480px;">
+    <div class="card shadow border-0 rounded-4 p-4 bg-white">
+
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-navy mb-1">
+                <i class="bi bi-person-plus-fill text-info me-2"></i>Create AU Account
+            </h3>
+            <p class="text-muted small">Access the AU Kharian Lost & Found Registry Network</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger rounded-3 small fw-semibold py-2 shadow-sm">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success rounded-3 small fw-semibold py-2 shadow-sm">
+                <i class="bi bi-check-circle-fill me-2"></i>@successMessage
+            </div>
+        }
+
+        <form @submit:preventDefault="HandleRegistration">
+
+            <div class="mb-3">
+                <label class="form-label fw-bold small mb-1">Official University Email <span class="text-danger">*</span></label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                    <input type="email" @bind="email" class="form-control border-start-0 py-2 small" placeholder="e.g., 247240@@students.au.edu.pk" required />
+                </div>
+                <div class="form-text xsmall text-muted mt-1">Must be an official student/staff registration domain.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold small mb-1">Password <span class="text-danger">*</span></label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+                    <input type="password" @bind="password" class="form-control border-start-0 py-2 small" placeholder="Enter secure password" required />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold small mb-1">Confirm Password <span class="text-danger">*</span></label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-shield-check"></i></span>
+                    <input type="password" @bind="confirmPassword" class="form-control border-start-0 py-2 small" placeholder="Repeat your password" required />
+                </div>
+            </div>
+
+            <button type="submit" disabled="@isProcessing" class="btn btn-navy w-100 rounded-pill py-2 fw-bold shadow-sm mb-3">
+                @if (isProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Creating Profile...</span>
+                }
+                else
+                {
+                    <span><i class="bi bi-person-check-fill me-1"></i> Sign Up</span>
+                }
+            </button>
+
+            <div class="text-center small mt-2">
+                <span class="text-muted">Already have a campus profile?</span>
+                <a href="login" class="text-info fw-bold ms-1 text-decoration-none">Sign In here</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string confirmPassword = "";
+
+    private string? errorMessage;
+    private string? successMessage;
+    private bool isProcessing = false;
+
+    private async Task HandleRegistration()
+    {
+        errorMessage = null;
+        successMessage = null;
+
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "All required setup fields must be completed.";
+            return;
+        }
+
+        // --- EXPLICIT AU CAMPUS EMAIL DOMAIN VALIDATOR ---
+        var cleanEmail = email.Trim().ToLower();
+        if (!cleanEmail.EndsWith("@@students.au.edu.pk") && !cleanEmail.EndsWith("@@au.edu.pk"))
+        {
+            errorMessage = "Access Blocked: You must use an official Air University address (e.g., @students.au.edu.pk).";
+            return;
+        }
+
+        if (password != confirmPassword)
+        {
+            errorMessage = "Input Conflict: Passwords do not match.";
+            return;
+        }
+
+        if (password.Length < 4) // Matches typical school test lengths cleanly
+        {
+            errorMessage = "Password security issue: Must be at least 4 characters long.";
+            return;
+        }
+
+        try
+        {
+            isProcessing = true;
+            StateHasChanged();
+
+            var newCampusUser = new User
+            {
+                Email = email.Trim(),
+                Password = password
+            };
+
+            // Call to your concrete entity context tracking pipeline
+            bool registrationSuccess = await UserService.RegisterUserAsync(newCampusUser);
+
+            if (registrationSuccess)
+            {
+                successMessage = "AU profile registered successfully! Route redirecting...";
+                StateHasChanged();
+
+                await Task.Delay(1500);
+                Nav.NavigateTo("login");
+            }
+            else
+            {
+                errorMessage = "This identity record email is already active in the registry system database.";
+                isProcessing = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"System Validation Error: {ex.GetBaseException().Message}";
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+}

@@ -26,5 +26,6 @@ namespace Lost_And_Found_Portal.Services
 		}
 
 		private void NotifyStateChanged() => OnStateChange?.Invoke();
+
 	}
 }
