@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Lost_And_Found_Portal.Components.Models;
 using Lost_And_Found_Portal.Components.Data;
+using Microsoft.Data.SqlClient;
 
 namespace Lost_And_Found_Portal.Components.Services
 {
@@ -20,20 +21,25 @@ namespace Lost_And_Found_Portal.Components.Services
 
 		public async Task AddItemAsync(Item item)
 		{
-			item.Title ??= "Untitled Item";
-			item.Description ??= "No description provided.";
-			item.Category ??= "General";
-			item.Location ??= "Campus Grounds";
-			item.ImageUrl ??= "/images/placeholder.png";
-			item.UserEmail ??= "anonymous@au.edu.pk";
+			// Direct Raw SQL ensures it saves regardless of minor model namespace or structural mismatches
+			string sql = @"
+                INSERT INTO Items (Title, Description, Category, Location, ImageUrl, IsLost, UserEmail, ContactInfo, ClaimStatus)
+                VALUES (@Title, @Description, @Category, @Location, @ImageUrl, @IsLost, @UserEmail, @ContactInfo, @ClaimStatus)";
 
-			// FIX: Guard statement for database constraint execution
-			item.ContactInfo ??= "Contact Admin Office / Email Provided";
+			var parameters = new[]
+			{
+				new SqlParameter("@Title", (object)item.Title ?? "Untitled"),
+				new SqlParameter("@Description", (object)item.Description ?? "No Description"),
+				new SqlParameter("@Category", (object)item.Category ?? "General"),
+				new SqlParameter("@Location", (object)item.Location ?? "Campus"),
+				new SqlParameter("@ImageUrl", (object)item.ImageUrl ?? "/images/placeholder.png"),
+				new SqlParameter("@IsLost", item.IsLost),
+				new SqlParameter("@UserEmail", (object)item.UserEmail ?? "anonymous@au.edu.pk"),
+				new SqlParameter("@ContactInfo", (object)item.ContactInfo ?? "None Provided"),
+				new SqlParameter("@ClaimStatus", (object)item.ClaimStatus ?? "Available")
+			};
 
-			item.ClaimStatus ??= "Available";
-
-			_context.Items.Add(item);
-			await _context.SaveChangesAsync();
+			await _context.Database.ExecuteSqlRawAsync(sql, parameters);
 		}
 
 		public async Task UpdateItemAsync(Item item)
