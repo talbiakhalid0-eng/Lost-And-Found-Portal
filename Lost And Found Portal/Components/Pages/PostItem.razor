@@ -1,7 +1,6 @@
 ﻿@page "/report-case"
 @using Lost_And_Found_Portal.Components.Models
 @using Lost_And_Found_Portal.Components.Services
-@using Lost_And_Found_Portal.Services
 @inject IItemService ItemService
 @inject UserSessionState SessionState
 @inject NavigationManager Nav
@@ -33,12 +32,42 @@
             </div>
 
             <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Description:</label>
+                <textarea @bind="itemDescription" rows="3" style="width: 100%; padding: 6px; resize: vertical;" placeholder="Provide details like color, brand, or unique marks..."></textarea>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Category:</label>
+                <select @bind="itemCategory" style="width: 100%; padding: 6px;">
+                    <option value="Electronics">Electronics</option>
+                    <option value="Documents">Documents/IDs</option>
+                    <option value="Personal Items">Personal Items (Wallet, Bags)</option>
+                    <option value="Books/Stationery">Books & Stationery</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Location Found / Lost:</label>
                 <input type="text" @bind="itemLocation" style="width: 100%; padding: 6px;" placeholder="e.g., Cafeteria, Block B" />
                 @if (showErrors && string.IsNullOrWhiteSpace(itemLocation))
                 {
                     <div style="color: red; font-size: 0.85rem;">Please specify a campus location.</div>
                 }
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Contact Info (Phone / WhatsApp):</label>
+                <input type="text" @bind="itemContactInfo" style="width: 100%; padding: 6px;" placeholder="e.g., Phone number or specific instructions" />
+                @if (showErrors && string.IsNullOrWhiteSpace(itemContactInfo))
+                {
+                    <div style="color: red; font-size: 0.85rem;">Please provide contact info so others can reach you.</div>
+                }
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Image Link / URL:</label>
+                <input type="text" @bind="itemImageUrl" style="width: 100%; padding: 6px;" placeholder="e.g., /images/keys.jpg" />
             </div>
 
             <div style="margin-bottom: 15px;">
@@ -49,7 +78,7 @@
                 </select>
             </div>
 
-            <button type="button" @onclick="ProcessSubmission" style="padding: 8px 24px; background-color: #004071; color: white; border: none; font-weight: bold; cursor: pointer;">
+            <button type="button" @onclick="ProcessSubmission" style="padding: 8px 24px; background-color: #004071; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%;">
                 Submit Report
             </button>
         </div>
@@ -58,7 +87,11 @@
 
 @code {
     private string itemTitle = "";
+    private string itemDescription = "";
+    private string itemCategory = "Personal Items";
     private string itemLocation = "";
+    private string itemContactInfo = "";
+    private string itemImageUrl = "";
     private string isLostString = "True";
     private string? successMessage;
     private bool showErrors = false;
@@ -75,8 +108,7 @@
     {
         showErrors = false;
 
-        // Clean internal validation check
-        if (string.IsNullOrWhiteSpace(itemTitle) || string.IsNullOrWhiteSpace(itemLocation))
+        if (string.IsNullOrWhiteSpace(itemTitle) || string.IsNullOrWhiteSpace(itemLocation) || string.IsNullOrWhiteSpace(itemContactInfo))
         {
             showErrors = true;
             return;
@@ -85,7 +117,11 @@
         var itemModel = new Item
         {
             Title = itemTitle,
+            Description = string.IsNullOrWhiteSpace(itemDescription) ? "No description provided." : itemDescription,
+            Category = itemCategory,
             Location = itemLocation,
+            ContactInfo = itemContactInfo,
+            ImageUrl = string.IsNullOrWhiteSpace(itemImageUrl) ? "/images/placeholder.png" : itemImageUrl,
             IsLost = bool.Parse(isLostString),
             UserEmail = SessionState.CurrentUserEmail ?? "anonymous@au.edu.pk",
             ClaimStatus = "Available"

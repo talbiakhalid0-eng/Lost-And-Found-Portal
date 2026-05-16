@@ -10,6 +10,8 @@
 		public string? ImageUrl { get; set; }
 		public bool IsLost { get; set; }
 		public string? UserEmail { get; set; }
+		public string? ContactInfo { get; set; }
+
 		public string? ClaimedByEmail { get; set; }
 		public string? ClaimStatus { get; set; }
 	}

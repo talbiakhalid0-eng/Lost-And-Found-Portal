@@ -20,13 +20,16 @@ namespace Lost_And_Found_Portal.Components.Services
 
 		public async Task AddItemAsync(Item item)
 		{
-			// Set robust defaults for any property left blank by the user form
 			item.Title ??= "Untitled Item";
 			item.Description ??= "No description provided.";
 			item.Category ??= "General";
 			item.Location ??= "Campus Grounds";
 			item.ImageUrl ??= "/images/placeholder.png";
 			item.UserEmail ??= "anonymous@au.edu.pk";
+
+			// FIX: Guard statement for database constraint execution
+			item.ContactInfo ??= "Contact Admin Office / Email Provided";
+
 			item.ClaimStatus ??= "Available";
 
 			_context.Items.Add(item);
