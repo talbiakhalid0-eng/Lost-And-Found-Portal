@@ -1,16 +1,56 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm px-4" style="background-color: #003366;">
+﻿@using Lost_And_Found_Portal.Components.Services
+@inject UserSessionState SessionState
+@inject NavigationManager Nav
+@implements IDisposable
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm px-4" style="background-color: #003366;">
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
             <i class="bi bi-airplane-engines me-2 text-info"></i>
             <span>AU KHARIAN <span class="text-info">PORTAL</span></span>
         </a>
 
-
         <div class="ms-auto d-flex align-items-center">
             <NavLink class="nav-link text-white px-3" href="#how-it-works">How It Works?</NavLink>
             <NavLink class="nav-link text-white px-3" href="report-case">Report Case</NavLink>
             <NavLink class="nav-link text-white px-3" href="dashboard">Browse Items</NavLink>
-            <a href="login" class="btn btn-info rounded-pill ms-4 px-5 py-2 fw-bold fs-5 shadow">Sign In</a>
+
+            @* Dynamic Session Interface Block *@
+            @if (SessionState.IsLoggedIn)
+            {
+                <div class="d-flex align-items-center ms-4">
+                    <span class="text-white me-3 fw-semibold small">
+                        <i class="bi bi-person-circle text-info me-1"></i> @SessionState.CurrentUserEmail
+                    </span>
+                    <button @onclick="HandleLogout" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 fw-bold shadow-sm">
+                        Logout
+                    </button>
+                </div>
+            }
+            else
+            {
+                <a href="login" class="btn btn-info rounded-pill ms-4 px-5 py-2 fw-bold fs-5 shadow">Sign In</a>
+            }
         </div>
     </div>
 </nav>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Tell the navigation bar to update automatically whenever a login or logout event triggers
+        SessionState.OnStateChange += StateHasChanged;
+    }
+
+    private void HandleLogout()
+    {
+        SessionState.Logout();
+        Nav.NavigateTo("/", forceLoad: true); // Pull users safely back out to the main landing page
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe when the component lifecycle ends to avoid browser memory leaks
+        SessionState.OnStateChange -= StateHasChanged;
+    }
+}
