@@ -16,18 +16,19 @@
         </div>
     </div>
 
-    @if (filteredItems == null)
+    @if (isLoading)
     {
         <div class="text-center mt-5">
             <div class="spinner-border text-info" role="status"></div>
-            <p>Loading reports...</p>
+            <p class="mt-2">Loading reports...</p>
         </div>
     }
-    else if (!filteredItems.Any())
+    else if (filteredItems == null || !filteredItems.Any())
     {
-        <div class="alert alert-light text-center border p-5 rounded-4">
+        <div class="alert alert-light text-center border p-5 rounded-4 shadow-sm">
             <i class="bi bi-search display-1 text-muted"></i>
-            <p class="mt-3">No matching reports found for AU Kharian.</p>
+            <p class="mt-3 fw-semibold text-secondary">No active reports found for AU Kharian.</p>
+            <p class="small text-muted">Be the first to post a lost or found item!</p>
         </div>
     }
     else
@@ -37,7 +38,6 @@
             {
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                        @* Placeholder for Item Image *@
                         <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
                             <i class="bi bi-image text-muted display-4"></i>
                         </div>
@@ -61,19 +61,49 @@
 @code {
     private List<Item> allItems = new();
     private List<Item> filteredItems = new();
+    private bool isLoading = true; // Added safety flag
 
     protected override async Task OnInitializedAsync()
     {
-        allItems = await ItemService.GetAllItemsAsync();
-        filteredItems = allItems;
+        try
+        {
+            isLoading = true;
+
+            // Fetch items from DB safely
+            var data = await ItemService.GetAllItemsAsync();
+
+            if (data != null)
+            {
+                allItems = data;
+                filteredItems = allItems;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Fallback: If DB query crashes, we gracefully show an empty list instead of a white screen
+            Console.WriteLine($"Dashboard DB Load Error: {ex.Message}");
+            allItems = new List<Item>();
+            filteredItems = new List<Item>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private void HandleSearch(ChangeEventArgs e)
     {
         var searchTerm = e.Value?.ToString()?.ToLower() ?? "";
+
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredItems = allItems;
+            return;
+        }
+
         filteredItems = allItems
-            .Where(i => i.Title.ToLower().Contains(searchTerm) ||
-                        i.Location.ToLower().Contains(searchTerm))
+            .Where(i => (!string.IsNullOrEmpty(i.Title) && i.Title.ToLower().Contains(searchTerm)) ||
+                        (!string.IsNullOrEmpty(i.Location) && i.Location.ToLower().Contains(searchTerm)))
             .ToList();
     }
 }
