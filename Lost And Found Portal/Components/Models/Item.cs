@@ -14,5 +14,6 @@
 		public string ClaimStatus { get; set; } = "Available"; // Available, PendingApproval, Claimed
 		public string? ClaimedByEmail { get; set; }
 		public string? ClaimProofOfOwnership { get; set; }
+		public bool IsNotificationPending { get; set; } = false;
 	}
 }
