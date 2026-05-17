@@ -361,9 +361,8 @@
         }
         else
         {
-            item.ClaimStatus = "Available";
-            item.ClaimedByEmail = null;
-            item.ClaimProofOfOwnership = null;
+            // 🛠️ Keep user metadata attached and flag it as Rejected so the UI doesn't reset to "Claim Item"
+            item.ClaimStatus = "Rejected";
         }
 
         // 🔔 Activate notification marker so the user sees the update banner on their dashboard
@@ -385,6 +384,15 @@
     private async Task DismissNotification(Item item)
     {
         item.IsNotificationPending = false;
+
+        // 🧹 Clean up user metadata once the student acknowledges the rejection banner
+        if (item.ClaimStatus == "Rejected")
+        {
+            item.ClaimStatus = "Available";
+            item.ClaimedByEmail = null;
+            item.ClaimProofOfOwnership = null;
+        }
+
         await ItemService.UpdateItemAsync(item);
         await LoadDashboardData();
     }

@@ -55,6 +55,9 @@ namespace Lost_And_Found_Portal.Migrations
                     b.Property<bool>("IsLost")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsNotificationPending")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
