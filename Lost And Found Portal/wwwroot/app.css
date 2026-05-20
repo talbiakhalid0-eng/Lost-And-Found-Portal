@@ -163,3 +163,26 @@ h1, h2, h3, .display-4, .display-3 {
 		transform: translateY(-2px) scale(1.02);
 		box-shadow: 0 8px 25px rgba(13, 202, 240, 0.3) !important;
 	}
+
+/* Target the images within your catalog cards strictly */
+ .card img.card-img-top {
+	width: 100% !important;
+	height: 200px !important; /* Forces uniform height across the entire row */
+	object-fit: cover !important; /* Crops cleanly instead of squishing */
+	object-position: center !important; /* Keeps the center focus of the photo */
+	display: block !important;
+}
+
+/* Hard shell container override to protect the rounded-4 corners */
+.card.overflow-hidden {
+	overflow: hidden !important;
+	display: flex !important;
+	flex-direction: column !important;
+	border-radius: 1rem !important; /* Matches your rounded-4 profile */
+}
+
+/* Ensure card footer contents sit neatly below the image zone */
+ .card-body {
+	flex-grow: 1;
+	background-color: #ffffff !important;
+}
